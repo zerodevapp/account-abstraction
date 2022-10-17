@@ -8,34 +8,47 @@ const PAYMASTER_STAKE = ethers.utils.parseEther('1')
 
 const deployEntryPoint: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const provider = ethers.provider
-  const from = await provider.getSigner().getAddress()
+  const signer = provider.getSigner()
+
+  // Send ETH to the user -- just for testing
+  const tx = await signer.sendTransaction({
+    to: "0xCD0b873c2f8f6e34dda075F82C73567712ed28DE",
+    value: ethers.utils.parseEther("1.0")
+  })
+  await tx.wait()
+
+  const from = await signer.getAddress()
   await new Create2Factory(ethers.provider).deployFactory()
 
   const ret = await hre.deployments.deploy(
     'EntryPoint', {
-      from,
-      args: [PAYMASTER_STAKE, UNSTAKE_DELAY_SEC],
-      gasLimit: 4e6,
-      deterministicDeployment: true
-    })
+    from,
+    args: [PAYMASTER_STAKE, UNSTAKE_DELAY_SEC],
+    gasLimit: 4e6,
+    deterministicDeployment: true
+  })
   console.log('==entrypoint addr=', ret.address)
-  const entryPointAddress = ret.address
+  // const entryPointAddress = ret.address
 
-  const w = await hre.deployments.deploy(
-    'SimpleWallet', {
-      from,
-      args: [entryPointAddress, from],
-      gasLimit: 2e6,
-      deterministicDeployment: true
-    })
-
-  console.log('== wallet=', w.address)
-
-  const t = await hre.deployments.deploy('TestCounter', {
+  const s = await hre.deployments.deploy(
+    'SimpleWalletDeployer', {
     from,
     deterministicDeployment: true
   })
-  console.log('==testCounter=', t.address)
+
+  console.log('== wallet deployer =', s.address)
+
+  // const t = await hre.deployments.deploy('TestCounter', {
+  //   from,
+  //   deterministicDeployment: true
+  // })
+  // console.log('==testCounter=', t.address)
+
+  const t = await hre.deployments.deploy('TestToken', {
+    from,
+    deterministicDeployment: true
+  })
+  console.log('==testToken=', t.address)
 }
 
 export default deployEntryPoint

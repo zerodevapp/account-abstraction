@@ -1,3 +1,6 @@
+import * as dotenv from 'dotenv' // see https://github.com/motdotla/dotenv#how-do-i-use-dotenv-with-import
+dotenv.config()
+
 import '@nomiclabs/hardhat-waffle'
 import '@typechain/hardhat'
 import { HardhatUserConfig } from 'hardhat/config'
@@ -12,14 +15,14 @@ const mnemonicFileName = process.env.MNEMONIC_FILE ?? `${process.env.HOME}/.secr
 let mnemonic = 'test '.repeat(11) + 'junk'
 if (fs.existsSync(mnemonicFileName)) { mnemonic = fs.readFileSync(mnemonicFileName, 'ascii') }
 
-function getNetwork1 (url: string): { url: string, accounts: { mnemonic: string } } {
+function getNetwork1(url: string): { url: string, accounts: { mnemonic: string } } {
   return {
     url,
     accounts: { mnemonic }
   }
 }
 
-function getNetwork (name: string): { url: string, accounts: { mnemonic: string } } {
+function getNetwork(name: string): { url: string, accounts: { mnemonic: string } } {
   return getNetwork1(`https://${name}.infura.io/v3/${process.env.INFURA_ID}`)
   // return getNetwork1(`wss://${name}.infura.io/ws/v3/${process.env.INFURA_ID}`)
 }
@@ -35,12 +38,16 @@ const config: HardhatUserConfig = {
     }
   },
   networks: {
-    dev: { url: 'http://localhost:8545' },
+    dev: {
+      url: 'http://127.0.0.1:8545',
+      allowUnlimitedContractSize: true,
+    },
     // github action starts localgeth service, for gas calculations
     localgeth: { url: 'http://localgeth:8545' },
     goerli: getNetwork('goerli'),
     proxy: getNetwork1('http://localhost:8545'),
-    kovan: getNetwork('kovan')
+    kovan: getNetwork('kovan'),
+    mumbai: getNetwork('polygon-mumbai'),
   },
   mocha: {
     timeout: 10000

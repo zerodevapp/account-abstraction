@@ -1,0 +1,441 @@
+{
+  "address": "0xc2a079ABD89cd50cf8b2bd0DDe3A89A30fb939b7",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "contract IEntryPoint",
+          "name": "anEntryPoint",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "anOwner",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "oldEntryPoint",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "newEntryPoint",
+          "type": "address"
+        }
+      ],
+      "name": "EntryPointChanged",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "addDeposit",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "entryPoint",
+      "outputs": [
+        {
+          "internalType": "contract IEntryPoint",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "dest",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "value",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes",
+          "name": "func",
+          "type": "bytes"
+        }
+      ],
+      "name": "exec",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address[]",
+          "name": "dest",
+          "type": "address[]"
+        },
+        {
+          "internalType": "bytes[]",
+          "name": "func",
+          "type": "bytes[]"
+        }
+      ],
+      "name": "execBatch",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "dest",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "value",
+          "type": "uint256"
+        },
+        {
+          "internalType": "bytes",
+          "name": "func",
+          "type": "bytes"
+        }
+      ],
+      "name": "execFromEntryPoint",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getDeposit",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "nonce",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address payable",
+          "name": "dest",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "transfer",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "newEntryPoint",
+          "type": "address"
+        }
+      ],
+      "name": "updateEntryPoint",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "sender",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "nonce",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bytes",
+              "name": "initCode",
+              "type": "bytes"
+            },
+            {
+              "internalType": "bytes",
+              "name": "callData",
+              "type": "bytes"
+            },
+            {
+              "internalType": "uint256",
+              "name": "callGasLimit",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "verificationGasLimit",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "preVerificationGas",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "maxFeePerGas",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "maxPriorityFeePerGas",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bytes",
+              "name": "paymasterAndData",
+              "type": "bytes"
+            },
+            {
+              "internalType": "bytes",
+              "name": "signature",
+              "type": "bytes"
+            }
+          ],
+          "internalType": "struct UserOperation",
+          "name": "userOp",
+          "type": "tuple"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "requestId",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "address",
+          "name": "aggregator",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "missingWalletFunds",
+          "type": "uint256"
+        }
+      ],
+      "name": "validateUserOp",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address payable",
+          "name": "withdrawAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "withdrawDepositTo",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "stateMutability": "payable",
+      "type": "receive"
+    }
+  ],
+  "transactionHash": "0xa5c4edfebbf575410d270fd7f3f4b513a3ca4f45dd2ac1954bf9fce198ade29e",
+  "receipt": {
+    "to": "0x4e59b44847b379578588920cA78FbF26c0B4956C",
+    "from": "0xdA33acb9EB2f46ea96a13E815bB444E9046c5D55",
+    "contractAddress": null,
+    "transactionIndex": 23,
+    "gasUsed": "1148228",
+    "logsBloom": "0x00000000000000000000002000000000000000000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000800000000000000000000100000000004000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000080000000000000000000200000000000000000000000000000000000000000000000400000000000004000000000000000000001000000000000002000000000000000100040000000000000000000000000000000000000000000000000000000000000000000100000",
+    "blockHash": "0xad789a4e022223f7a5eb2ddd66347eac66b0ed41f94df12d49d08b19df102423",
+    "transactionHash": "0xa5c4edfebbf575410d270fd7f3f4b513a3ca4f45dd2ac1954bf9fce198ade29e",
+    "logs": [
+      {
+        "transactionIndex": 23,
+        "blockNumber": 28640751,
+        "transactionHash": "0xa5c4edfebbf575410d270fd7f3f4b513a3ca4f45dd2ac1954bf9fce198ade29e",
+        "address": "0x0000000000000000000000000000000000001010",
+        "topics": [
+          "0x4dfe1bbbcf077ddc3e01291eea2d5c70c2b422b415d95645b9adcfd678cb1d63",
+          "0x0000000000000000000000000000000000000000000000000000000000001010",
+          "0x000000000000000000000000da33acb9eb2f46ea96a13e815bb444e9046c5d55",
+          "0x000000000000000000000000be188d6641e8b680743a4815dfa0f6208038960f"
+        ],
+        "data": "0x000000000000000000000000000000000000000000000000000e47135336cc0000000000000000000000000000000000000000000000000002c68af0bb14000000000000000000000000000000000000000000000000267c244d8047bf035ed000000000000000000000000000000000000000000000000002b843dd67dd340000000000000000000000000000000000000000000000267c245bc75b123a2ad0",
+        "logIndex": 130,
+        "blockHash": "0xad789a4e022223f7a5eb2ddd66347eac66b0ed41f94df12d49d08b19df102423"
+      }
+    ],
+    "blockNumber": 28640751,
+    "cumulativeGasUsed": "5660425",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": [
+    "0x1b98F08dB8F12392EAE339674e568fe29929bC47",
+    "0xdA33acb9EB2f46ea96a13E815bB444E9046c5D55"
+  ],
+  "numDeployments": 1,
+  "solcInputHash": "12a21f2ed52f25bc155cce0369ffbeac",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.15+commit.e14f2714\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"contract IEntryPoint\",\"name\":\"anEntryPoint\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"anOwner\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"oldEntryPoint\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newEntryPoint\",\"type\":\"address\"}],\"name\":\"EntryPointChanged\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"addDeposit\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"entryPoint\",\"outputs\":[{\"internalType\":\"contract IEntryPoint\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"dest\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"func\",\"type\":\"bytes\"}],\"name\":\"exec\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address[]\",\"name\":\"dest\",\"type\":\"address[]\"},{\"internalType\":\"bytes[]\",\"name\":\"func\",\"type\":\"bytes[]\"}],\"name\":\"execBatch\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"dest\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"func\",\"type\":\"bytes\"}],\"name\":\"execFromEntryPoint\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getDeposit\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"nonce\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address payable\",\"name\":\"dest\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"transfer\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newEntryPoint\",\"type\":\"address\"}],\"name\":\"updateEntryPoint\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"nonce\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"initCode\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"callData\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"callGasLimit\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"verificationGasLimit\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"preVerificationGas\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"maxFeePerGas\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"maxPriorityFeePerGas\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"paymasterAndData\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"signature\",\"type\":\"bytes\"}],\"internalType\":\"struct UserOperation\",\"name\":\"userOp\",\"type\":\"tuple\"},{\"internalType\":\"bytes32\",\"name\":\"requestId\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"aggregator\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"missingWalletFunds\",\"type\":\"uint256\"}],\"name\":\"validateUserOp\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address payable\",\"name\":\"withdrawAddress\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"withdrawDepositTo\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"stateMutability\":\"payable\",\"type\":\"receive\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"updateEntryPoint(address)\":{\"params\":{\"newEntryPoint\":\"the new entrypoint to trust.\"}},\"withdrawDepositTo(address,uint256)\":{\"params\":{\"amount\":\"to withdraw\",\"withdrawAddress\":\"target to send to\"}}},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{\"addDeposit()\":{\"notice\":\"deposit more funds for this wallet in the entryPoint\"},\"entryPoint()\":{\"notice\":\"return the entryPoint used by this wallet. subclass should return the current entryPoint used by this wallet.\"},\"exec(address,uint256,bytes)\":{\"notice\":\"execute a transaction (called directly from owner, not by entryPoint)\"},\"execBatch(address[],bytes[])\":{\"notice\":\"execute a sequence of transaction\"},\"getDeposit()\":{\"notice\":\"check current wallet deposit in the entryPoint\"},\"nonce()\":{\"notice\":\"return the wallet nonce. subclass should return a nonce value that is used both by _validateAndUpdateNonce, and by the external provider (to read the current nonce)\"},\"transfer(address,uint256)\":{\"notice\":\"transfer eth value to a destination address\"},\"updateEntryPoint(address)\":{\"notice\":\"expose an api to modify the entryPoint. must be called by current \\\"admin\\\" of the wallet.\"},\"validateUserOp((address,uint256,bytes,bytes,uint256,uint256,uint256,uint256,uint256,bytes,bytes),bytes32,address,uint256)\":{\"notice\":\"Validate user's signature and nonce. subclass doesn't override this method. instead, it should override the specific internal validation methods.\"},\"withdrawDepositTo(address,uint256)\":{\"notice\":\"withdraw value from the wallet's deposit\"}},\"notice\":\"minimal wallet.  this is sample minimal wallet.  has execute, eth handling methods  has a single signer that can send requests through the entryPoint.\",\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/samples/SimpleWallet.sol\":\"SimpleWallet\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":1000000},\"remappings\":[]},\"sources\":{\"@openzeppelin/contracts/utils/Strings.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts (last updated v4.7.0) (utils/Strings.sol)\\n\\npragma solidity ^0.8.0;\\n\\n/**\\n * @dev String operations.\\n */\\nlibrary Strings {\\n    bytes16 private constant _HEX_SYMBOLS = \\\"0123456789abcdef\\\";\\n    uint8 private constant _ADDRESS_LENGTH = 20;\\n\\n    /**\\n     * @dev Converts a `uint256` to its ASCII `string` decimal representation.\\n     */\\n    function toString(uint256 value) internal pure returns (string memory) {\\n        // Inspired by OraclizeAPI's implementation - MIT licence\\n        // https://github.com/oraclize/ethereum-api/blob/b42146b063c7d6ee1358846c198246239e9360e8/oraclizeAPI_0.4.25.sol\\n\\n        if (value == 0) {\\n            return \\\"0\\\";\\n        }\\n        uint256 temp = value;\\n        uint256 digits;\\n        while (temp != 0) {\\n            digits++;\\n            temp /= 10;\\n        }\\n        bytes memory buffer = new bytes(digits);\\n        while (value != 0) {\\n            digits -= 1;\\n            buffer[digits] = bytes1(uint8(48 + uint256(value % 10)));\\n            value /= 10;\\n        }\\n        return string(buffer);\\n    }\\n\\n    /**\\n     * @dev Converts a `uint256` to its ASCII `string` hexadecimal representation.\\n     */\\n    function toHexString(uint256 value) internal pure returns (string memory) {\\n        if (value == 0) {\\n            return \\\"0x00\\\";\\n        }\\n        uint256 temp = value;\\n        uint256 length = 0;\\n        while (temp != 0) {\\n            length++;\\n            temp >>= 8;\\n        }\\n        return toHexString(value, length);\\n    }\\n\\n    /**\\n     * @dev Converts a `uint256` to its ASCII `string` hexadecimal representation with fixed length.\\n     */\\n    function toHexString(uint256 value, uint256 length) internal pure returns (string memory) {\\n        bytes memory buffer = new bytes(2 * length + 2);\\n        buffer[0] = \\\"0\\\";\\n        buffer[1] = \\\"x\\\";\\n        for (uint256 i = 2 * length + 1; i > 1; --i) {\\n            buffer[i] = _HEX_SYMBOLS[value & 0xf];\\n            value >>= 4;\\n        }\\n        require(value == 0, \\\"Strings: hex length insufficient\\\");\\n        return string(buffer);\\n    }\\n\\n    /**\\n     * @dev Converts an `address` with fixed length of 20 bytes to its not checksummed ASCII `string` hexadecimal representation.\\n     */\\n    function toHexString(address addr) internal pure returns (string memory) {\\n        return toHexString(uint256(uint160(addr)), _ADDRESS_LENGTH);\\n    }\\n}\\n\",\"keccak256\":\"0xaf159a8b1923ad2a26d516089bceca9bdeaeacd04be50983ea00ba63070f08a3\",\"license\":\"MIT\"},\"@openzeppelin/contracts/utils/cryptography/ECDSA.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts (last updated v4.7.3) (utils/cryptography/ECDSA.sol)\\n\\npragma solidity ^0.8.0;\\n\\nimport \\\"../Strings.sol\\\";\\n\\n/**\\n * @dev Elliptic Curve Digital Signature Algorithm (ECDSA) operations.\\n *\\n * These functions can be used to verify that a message was signed by the holder\\n * of the private keys of a given address.\\n */\\nlibrary ECDSA {\\n    enum RecoverError {\\n        NoError,\\n        InvalidSignature,\\n        InvalidSignatureLength,\\n        InvalidSignatureS,\\n        InvalidSignatureV\\n    }\\n\\n    function _throwError(RecoverError error) private pure {\\n        if (error == RecoverError.NoError) {\\n            return; // no error: do nothing\\n        } else if (error == RecoverError.InvalidSignature) {\\n            revert(\\\"ECDSA: invalid signature\\\");\\n        } else if (error == RecoverError.InvalidSignatureLength) {\\n            revert(\\\"ECDSA: invalid signature length\\\");\\n        } else if (error == RecoverError.InvalidSignatureS) {\\n            revert(\\\"ECDSA: invalid signature 's' value\\\");\\n        } else if (error == RecoverError.InvalidSignatureV) {\\n            revert(\\\"ECDSA: invalid signature 'v' value\\\");\\n        }\\n    }\\n\\n    /**\\n     * @dev Returns the address that signed a hashed message (`hash`) with\\n     * `signature` or error string. This address can then be used for verification purposes.\\n     *\\n     * The `ecrecover` EVM opcode allows for malleable (non-unique) signatures:\\n     * this function rejects them by requiring the `s` value to be in the lower\\n     * half order, and the `v` value to be either 27 or 28.\\n     *\\n     * IMPORTANT: `hash` _must_ be the result of a hash operation for the\\n     * verification to be secure: it is possible to craft signatures that\\n     * recover to arbitrary addresses for non-hashed data. A safe way to ensure\\n     * this is by receiving a hash of the original message (which may otherwise\\n     * be too long), and then calling {toEthSignedMessageHash} on it.\\n     *\\n     * Documentation for signature generation:\\n     * - with https://web3js.readthedocs.io/en/v1.3.4/web3-eth-accounts.html#sign[Web3.js]\\n     * - with https://docs.ethers.io/v5/api/signer/#Signer-signMessage[ethers]\\n     *\\n     * _Available since v4.3._\\n     */\\n    function tryRecover(bytes32 hash, bytes memory signature) internal pure returns (address, RecoverError) {\\n        if (signature.length == 65) {\\n            bytes32 r;\\n            bytes32 s;\\n            uint8 v;\\n            // ecrecover takes the signature parameters, and the only way to get them\\n            // currently is to use assembly.\\n            /// @solidity memory-safe-assembly\\n            assembly {\\n                r := mload(add(signature, 0x20))\\n                s := mload(add(signature, 0x40))\\n                v := byte(0, mload(add(signature, 0x60)))\\n            }\\n            return tryRecover(hash, v, r, s);\\n        } else {\\n            return (address(0), RecoverError.InvalidSignatureLength);\\n        }\\n    }\\n\\n    /**\\n     * @dev Returns the address that signed a hashed message (`hash`) with\\n     * `signature`. This address can then be used for verification purposes.\\n     *\\n     * The `ecrecover` EVM opcode allows for malleable (non-unique) signatures:\\n     * this function rejects them by requiring the `s` value to be in the lower\\n     * half order, and the `v` value to be either 27 or 28.\\n     *\\n     * IMPORTANT: `hash` _must_ be the result of a hash operation for the\\n     * verification to be secure: it is possible to craft signatures that\\n     * recover to arbitrary addresses for non-hashed data. A safe way to ensure\\n     * this is by receiving a hash of the original message (which may otherwise\\n     * be too long), and then calling {toEthSignedMessageHash} on it.\\n     */\\n    function recover(bytes32 hash, bytes memory signature) internal pure returns (address) {\\n        (address recovered, RecoverError error) = tryRecover(hash, signature);\\n        _throwError(error);\\n        return recovered;\\n    }\\n\\n    /**\\n     * @dev Overload of {ECDSA-tryRecover} that receives the `r` and `vs` short-signature fields separately.\\n     *\\n     * See https://eips.ethereum.org/EIPS/eip-2098[EIP-2098 short signatures]\\n     *\\n     * _Available since v4.3._\\n     */\\n    function tryRecover(\\n        bytes32 hash,\\n        bytes32 r,\\n        bytes32 vs\\n    ) internal pure returns (address, RecoverError) {\\n        bytes32 s = vs & bytes32(0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff);\\n        uint8 v = uint8((uint256(vs) >> 255) + 27);\\n        return tryRecover(hash, v, r, s);\\n    }\\n\\n    /**\\n     * @dev Overload of {ECDSA-recover} that receives the `r and `vs` short-signature fields separately.\\n     *\\n     * _Available since v4.2._\\n     */\\n    function recover(\\n        bytes32 hash,\\n        bytes32 r,\\n        bytes32 vs\\n    ) internal pure returns (address) {\\n        (address recovered, RecoverError error) = tryRecover(hash, r, vs);\\n        _throwError(error);\\n        return recovered;\\n    }\\n\\n    /**\\n     * @dev Overload of {ECDSA-tryRecover} that receives the `v`,\\n     * `r` and `s` signature fields separately.\\n     *\\n     * _Available since v4.3._\\n     */\\n    function tryRecover(\\n        bytes32 hash,\\n        uint8 v,\\n        bytes32 r,\\n        bytes32 s\\n    ) internal pure returns (address, RecoverError) {\\n        // EIP-2 still allows signature malleability for ecrecover(). Remove this possibility and make the signature\\n        // unique. Appendix F in the Ethereum Yellow paper (https://ethereum.github.io/yellowpaper/paper.pdf), defines\\n        // the valid range for s in (301): 0 < s < secp256k1n \\u00f7 2 + 1, and for v in (302): v \\u2208 {27, 28}. Most\\n        // signatures from current libraries generate a unique signature with an s-value in the lower half order.\\n        //\\n        // If your library generates malleable signatures, such as s-values in the upper range, calculate a new s-value\\n        // with 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141 - s1 and flip v from 27 to 28 or\\n        // vice versa. If your library also generates signatures with 0/1 for v instead 27/28, add 27 to v to accept\\n        // these malleable signatures as well.\\n        if (uint256(s) > 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0) {\\n            return (address(0), RecoverError.InvalidSignatureS);\\n        }\\n        if (v != 27 && v != 28) {\\n            return (address(0), RecoverError.InvalidSignatureV);\\n        }\\n\\n        // If the signature is valid (and not malleable), return the signer address\\n        address signer = ecrecover(hash, v, r, s);\\n        if (signer == address(0)) {\\n            return (address(0), RecoverError.InvalidSignature);\\n        }\\n\\n        return (signer, RecoverError.NoError);\\n    }\\n\\n    /**\\n     * @dev Overload of {ECDSA-recover} that receives the `v`,\\n     * `r` and `s` signature fields separately.\\n     */\\n    function recover(\\n        bytes32 hash,\\n        uint8 v,\\n        bytes32 r,\\n        bytes32 s\\n    ) internal pure returns (address) {\\n        (address recovered, RecoverError error) = tryRecover(hash, v, r, s);\\n        _throwError(error);\\n        return recovered;\\n    }\\n\\n    /**\\n     * @dev Returns an Ethereum Signed Message, created from a `hash`. This\\n     * produces hash corresponding to the one signed with the\\n     * https://eth.wiki/json-rpc/API#eth_sign[`eth_sign`]\\n     * JSON-RPC method as part of EIP-191.\\n     *\\n     * See {recover}.\\n     */\\n    function toEthSignedMessageHash(bytes32 hash) internal pure returns (bytes32) {\\n        // 32 is the length in bytes of hash,\\n        // enforced by the type signature above\\n        return keccak256(abi.encodePacked(\\\"\\\\x19Ethereum Signed Message:\\\\n32\\\", hash));\\n    }\\n\\n    /**\\n     * @dev Returns an Ethereum Signed Message, created from `s`. This\\n     * produces hash corresponding to the one signed with the\\n     * https://eth.wiki/json-rpc/API#eth_sign[`eth_sign`]\\n     * JSON-RPC method as part of EIP-191.\\n     *\\n     * See {recover}.\\n     */\\n    function toEthSignedMessageHash(bytes memory s) internal pure returns (bytes32) {\\n        return keccak256(abi.encodePacked(\\\"\\\\x19Ethereum Signed Message:\\\\n\\\", Strings.toString(s.length), s));\\n    }\\n\\n    /**\\n     * @dev Returns an Ethereum Signed Typed Data, created from a\\n     * `domainSeparator` and a `structHash`. This produces hash corresponding\\n     * to the one signed with the\\n     * https://eips.ethereum.org/EIPS/eip-712[`eth_signTypedData`]\\n     * JSON-RPC method as part of EIP-712.\\n     *\\n     * See {recover}.\\n     */\\n    function toTypedDataHash(bytes32 domainSeparator, bytes32 structHash) internal pure returns (bytes32) {\\n        return keccak256(abi.encodePacked(\\\"\\\\x19\\\\x01\\\", domainSeparator, structHash));\\n    }\\n}\\n\",\"keccak256\":\"0xdb7f5c28fc61cda0bd8ab60ce288e206b791643bcd3ba464a70cbec18895a2f5\",\"license\":\"MIT\"},\"contracts/core/BaseWallet.sol\":{\"content\":\"// SPDX-License-Identifier: GPL-3.0\\npragma solidity ^0.8.12;\\n\\n/* solhint-disable avoid-low-level-calls */\\n/* solhint-disable no-inline-assembly */\\n/* solhint-disable reason-string */\\n\\nimport \\\"../interfaces/IWallet.sol\\\";\\nimport \\\"../interfaces/IEntryPoint.sol\\\";\\n\\n/**\\n * Basic wallet implementation.\\n * this contract provides the basic logic for implementing the IWallet interface  - validateUserOp\\n * specific wallet implementation should inherit it and provide the wallet-specific logic\\n */\\nabstract contract BaseWallet is IWallet {\\n    using UserOperationLib for UserOperation;\\n\\n    /**\\n     * return the wallet nonce.\\n     * subclass should return a nonce value that is used both by _validateAndUpdateNonce, and by the external provider (to read the current nonce)\\n     */\\n    function nonce() public view virtual returns (uint256);\\n\\n    /**\\n     * return the entryPoint used by this wallet.\\n     * subclass should return the current entryPoint used by this wallet.\\n     */\\n    function entryPoint() public view virtual returns (IEntryPoint);\\n\\n    /**\\n     * Validate user's signature and nonce.\\n     * subclass doesn't override this method. instead, it should override the specific internal validation methods.\\n     */\\n    function validateUserOp(UserOperation calldata userOp, bytes32 requestId, address aggregator, uint256 missingWalletFunds) external override {\\n        _requireFromEntryPoint();\\n        _validateSignature(userOp, requestId, aggregator);\\n        //during construction, the \\\"nonce\\\" field hold the salt.\\n        // if we assert it is zero, then we allow only a single wallet per owner.\\n        if (userOp.initCode.length == 0) {\\n            _validateAndUpdateNonce(userOp);\\n        }\\n        _payPrefund(missingWalletFunds);\\n    }\\n\\n    /**\\n     * ensure the request comes from the known entrypoint.\\n     */\\n    function _requireFromEntryPoint() internal virtual view {\\n        require(msg.sender == address(entryPoint()), \\\"wallet: not from EntryPoint\\\");\\n    }\\n\\n    /**\\n     * validate the signature is valid for this message.\\n     * @param userOp validate the userOp.signature field\\n     * @param requestId convenient field: the hash of the request, to check the signature against\\n     *          (also hashes the entrypoint and chain-id)\\n     * @param aggregator the current aggregator. can be ignored by wallets that don't use aggregators\\n     */\\n    function _validateSignature(UserOperation calldata userOp, bytes32 requestId, address aggregator) internal virtual view;\\n\\n    /**\\n     * validate the current nonce matches the UserOperation nonce.\\n     * then it should update the wallet's state to prevent replay of this UserOperation.\\n     * called only if initCode is empty (since \\\"nonce\\\" field is used as \\\"salt\\\" on wallet creation)\\n     * @param userOp the op to validate.\\n     */\\n    function _validateAndUpdateNonce(UserOperation calldata userOp) internal virtual;\\n\\n    /**\\n     * sends to the entrypoint (msg.sender) the missing funds for this transaction.\\n     * subclass MAY override this method for better funds management\\n     * (e.g. send to the entryPoint more than the minimum required, so that in future transactions\\n     * it will not be required to send again)\\n     * @param missingWalletFunds the minimum value this method should send the entrypoint.\\n     *  this value MAY be zero, in case there is enough deposit, or the userOp has a paymaster.\\n     */\\n    function _payPrefund(uint256 missingWalletFunds) internal virtual {\\n        if (missingWalletFunds != 0) {\\n            (bool success,) = payable(msg.sender).call{value : missingWalletFunds, gas : type(uint256).max}(\\\"\\\");\\n            (success);\\n            //ignore failure (its EntryPoint's job to verify, not wallet.)\\n        }\\n    }\\n\\n    /**\\n     * expose an api to modify the entryPoint.\\n     * must be called by current \\\"admin\\\" of the wallet.\\n     * @param newEntryPoint the new entrypoint to trust.\\n     */\\n    function updateEntryPoint(address newEntryPoint) external {\\n        _requireFromAdmin();\\n        _updateEntryPoint(newEntryPoint);\\n    }\\n\\n    /**\\n     * ensure the caller is allowed \\\"admin\\\" operations (such as changing the entryPoint)\\n     * default implementation trust the wallet itself (or any signer that passes \\\"validateUserOp\\\")\\n     * to be the \\\"admin\\\"\\n     */\\n    function _requireFromAdmin() internal view virtual {\\n        require(msg.sender == address(this) || msg.sender == address(entryPoint()), \\\"not admin\\\");\\n    }\\n\\n    /**\\n     * update the current entrypoint.\\n     * subclass should override and update current entrypoint\\n     */\\n    function _updateEntryPoint(address) internal virtual;\\n}\\n\",\"keccak256\":\"0x3d9a244b31521b59d7716db9412691d411e8b7d026413a769b8cb8065c7e3e69\",\"license\":\"GPL-3.0\"},\"contracts/interfaces/IAggregator.sol\":{\"content\":\"// SPDX-License-Identifier: GPL-3.0\\npragma solidity ^0.8.12;\\n\\nimport \\\"./UserOperation.sol\\\";\\n\\n/**\\n * Aggregated Signatures validator.\\n */\\ninterface IAggregator {\\n\\n    /**\\n     * validate aggregated signature.\\n     * revert if the aggregated signature does not match the given list of operations.\\n     */\\n    function validateSignatures(UserOperation[] calldata userOps, bytes calldata signature) external view;\\n\\n    /**\\n     * validate signature of a single userOp\\n     * This method is called by EntryPoint.simulateUserOperation() if the wallet has an aggregator.\\n     * First it validates the signature over the userOp. then it return data to be used when creating the handleOps:\\n     * @param userOp the userOperation received from the user.\\n     * @param offChainSigCheck if true, don't check signature, and leave it for the Bundler to use an off-chain native library.\\n     * @return sigForUserOp the value to put into the signature field of the userOp when calling handleOps.\\n     *    (usually empty, unless wallet and aggregator support some kind of \\\"multisig\\\"\\n     * @return sigForAggregation the value to pass (for all wallets) to aggregateSignatures()\\n     * @return offChainSigInfo in case offChainSigCheck is true, this value should be used by the off-chain signature code (e.g. it contains the sender's publickey)\\n     */\\n    function validateUserOpSignature(UserOperation calldata userOp, bool offChainSigCheck)\\n    external view returns (bytes memory sigForUserOp, bytes memory sigForAggregation, bytes memory offChainSigInfo);\\n\\n    /**\\n     * aggregate multiple signatures into a single value.\\n     * This method is called off-chain to calculate the signature to pass with handleOps()\\n     * bundler MAY use optimized custom code perform this aggregation\\n     * @param sigsForAggregation array of values returned by validateUserOpSignature() for each op\\n   * @return aggregatesSignature the aggregated signature\\n   */\\n    function aggregateSignatures(bytes[] calldata sigsForAggregation) external view returns (bytes memory aggregatesSignature);\\n}\\n\",\"keccak256\":\"0x3a3a7bf97e9b17144748bcd745edc0b8c4605781b349976db17a3031528f360c\",\"license\":\"GPL-3.0\"},\"contracts/interfaces/IEntryPoint.sol\":{\"content\":\"/**\\n ** Account-Abstraction (EIP-4337) singleton EntryPoint implementation.\\n ** Only one instance required on each chain.\\n **/\\n// SPDX-License-Identifier: GPL-3.0\\npragma solidity ^0.8.12;\\n\\n/* solhint-disable avoid-low-level-calls */\\n/* solhint-disable no-inline-assembly */\\n/* solhint-disable reason-string */\\n\\nimport \\\"./UserOperation.sol\\\";\\nimport \\\"./IStakeManager.sol\\\";\\nimport \\\"./IAggregator.sol\\\";\\n\\ninterface IEntryPoint is IStakeManager {\\n\\n    /***\\n     * An event emitted after each successful request\\n     * @param requestId - unique identifier for the request (hash its entire content, except signature).\\n     * @param sender - the account that generates this request.\\n     * @param paymaster - if non-null, the paymaster that pays for this request.\\n     * @param nonce - the nonce value from the request\\n     * @param actualGasCost - the total cost (in gas) of this request.\\n     * @param actualGasPrice - the actual gas price the sender agreed to pay.\\n     * @param success - true if the sender transaction succeeded, false if reverted.\\n     */\\n    event UserOperationEvent(bytes32 indexed requestId, address indexed sender, address indexed paymaster, uint256 nonce, uint256 actualGasCost, uint256 actualGasPrice, bool success);\\n\\n    /**\\n     * An event emitted if the UserOperation \\\"callData\\\" reverted with non-zero length\\n     * @param requestId the request unique identifier.\\n     * @param sender the sender of this request\\n     * @param nonce the nonce used in the request\\n     * @param revertReason - the return bytes from the (reverted) call to \\\"callData\\\".\\n     */\\n    event UserOperationRevertReason(bytes32 indexed requestId, address indexed sender, uint256 nonce, bytes revertReason);\\n\\n    /**\\n     * a custom revert error of handleOps, to identify the offending op.\\n     *  NOTE: if simulateValidation passes successfully, there should be no reason for handleOps to fail on it.\\n     *  @param opIndex - index into the array of ops to the failed one (in simulateValidation, this is always zero)\\n     *  @param paymaster - if paymaster.validatePaymasterUserOp fails, this will be the paymaster's address. if validateUserOp failed,\\n     *       this value will be zero (since it failed before accessing the paymaster)\\n     *  @param reason - revert reason\\n     *   Should be caught in off-chain handleOps simulation and not happen on-chain.\\n     *   Useful for mitigating DoS attempts against batchers or for troubleshooting of wallet/paymaster reverts.\\n     */\\n    error FailedOp(uint256 opIndex, address paymaster, string reason);\\n\\n    /**\\n     * error case when a signature aggregator fails to verify the aggregated signature it had created.\\n     */\\n    error SignatureValidationFailed(address aggregator);\\n\\n    //UserOps handled, per aggregator\\n    struct UserOpsPerAggregator {\\n        UserOperation[] userOps;\\n\\n        // aggregator address\\n        IAggregator aggregator;\\n        // aggregated signature\\n        bytes signature;\\n    }\\n\\n    /**\\n     * Execute a batch of UserOperation.\\n     * no signature aggregator is used.\\n     * if any wallet requires an aggregator (that is, it returned an \\\"actualAggregator\\\" when\\n     * performing simulateValidation), then handleAggregatedOps() must be used instead.\\n     * @param ops the operations to execute\\n     * @param beneficiary the address to receive the fees\\n     */\\n    function handleOps(UserOperation[] calldata ops, address payable beneficiary) external;\\n\\n    /**\\n     * Execute a batch of UserOperation with Aggregators\\n     * @param opsPerAggregator the operations to execute, grouped by aggregator (or address(0) for no-aggregator wallets)\\n     * @param beneficiary the address to receive the fees\\n     */\\n    function handleAggregatedOps(\\n        UserOpsPerAggregator[] calldata opsPerAggregator,\\n        address payable beneficiary\\n    ) external;\\n\\n    /**\\n     * generate a request Id - unique identifier for this request.\\n     * the request ID is a hash over the content of the userOp (except the signature), the entrypoint and the chainid.\\n     */\\n    function getRequestId(UserOperation calldata userOp) external view returns (bytes32);\\n\\n    /**\\n    * Simulate a call to wallet.validateUserOp and paymaster.validatePaymasterUserOp.\\n    * Validation succeeds if the call doesn't revert.\\n    * @dev The node must also verify it doesn't use banned opcodes, and that it doesn't reference storage outside the wallet's data.\\n     *      In order to split the running opcodes of the wallet (validateUserOp) from the paymaster's validatePaymasterUserOp,\\n     *      it should look for the NUMBER opcode at depth=1 (which itself is a banned opcode)\\n     * @param userOp the user operation to validate.\\n     * @param offChainSigCheck if the wallet has an aggregator, skip on-chain aggregation check. In thus case, the bundler must\\n     *          perform the equivalent check using an off-chain library code\\n     * @return preOpGas total gas used by validation (including contract creation)\\n     * @return prefund the amount the wallet had to prefund (zero in case a paymaster pays)\\n     * @return actualAggregator the aggregator used by this userOp. if a non-zero aggregator is returned, the bundler must get its params using\\n     *      aggregator.\\n     * @return sigForUserOp - only if has actualAggregator: this value is returned from IAggregator.validateUserOpSignature, and should be placed in the userOp.signature when creating a bundle.\\n     * @return sigForAggregation  - only if has actualAggregator:  this value is returned from IAggregator.validateUserOpSignature, and should be passed to aggregator.aggregateSignatures\\n     * @return offChainSigInfo - if has actualAggregator, and offChainSigCheck is true, this value should be used by the off-chain signature code (e.g. it contains the sender's publickey)\\n     */\\n    function simulateValidation(UserOperation calldata userOp, bool offChainSigCheck)\\n    external returns (uint256 preOpGas, uint256 prefund, address actualAggregator, bytes memory sigForUserOp, bytes memory sigForAggregation, bytes memory offChainSigInfo);\\n\\n    /**\\n     * Get counterfactual sender address.\\n     *  Calculate the sender contract address that will be generated by the initCode and salt in the UserOperation.\\n     * must be called from zero-address.\\n     * @param initCode the constructor code to be passed into the UserOperation.\\n     */\\n    function getSenderAddress(bytes memory initCode) external returns (address);\\n\\n    /**\\n     * return the storage cells used internally by the EntryPoint for this sender address.\\n     * During `simulateValidation`, allow these storage cells to be accessed\\n     *  (that is, a wallet/paymaster are allowed to access their own deposit balance on the\\n     *  EntryPoint's storage, but no other account)\\n     */\\n    function getSenderStorage(address sender) external view returns (uint256[] memory senderStorageCells);\\n}\\n\\n\",\"keccak256\":\"0xf052400aff95b11c5e9af5f25702d0b3a4207872e8d34beb4c52dbe048532e85\",\"license\":\"GPL-3.0\"},\"contracts/interfaces/IStakeManager.sol\":{\"content\":\"// SPDX-License-Identifier: GPL-3.0-only\\npragma solidity ^0.8.12;\\n\\n/**\\n * manage deposits and stakes.\\n * deposit is just a balance used to pay for UserOperations (either by a paymaster or a wallet)\\n * stake is value locked for at least \\\"unstakeDelay\\\" by a paymaster.\\n */\\ninterface IStakeManager {\\n\\n    event Deposited(\\n        address indexed account,\\n        uint256 totalDeposit\\n    );\\n\\n    event Withdrawn(\\n        address indexed account,\\n        address withdrawAddress,\\n        uint256 amount\\n    );\\n\\n    /// Emitted once a stake is scheduled for withdrawal\\n    event StakeLocked(\\n        address indexed account,\\n        uint256 totalStaked,\\n        uint256 withdrawTime\\n    );\\n\\n    /// Emitted once a stake is scheduled for withdrawal\\n    event StakeUnlocked(\\n        address indexed account,\\n        uint256 withdrawTime\\n    );\\n\\n    event StakeWithdrawn(\\n        address indexed account,\\n        address withdrawAddress,\\n        uint256 amount\\n    );\\n\\n    /**\\n     * minimum time (in seconds) required to lock a paymaster stake before it can be withdraw.\\n     */\\n    function unstakeDelaySec() external returns (uint32);\\n\\n    /**\\n     * minimum value required to stake for a paymaster\\n     */\\n    function paymasterStake() external returns (uint256);\\n\\n    /**\\n     * @param deposit the account's deposit\\n     * @param staked true if this account is staked as a paymaster\\n     * @param stake actual amount of ether staked for this paymaster. must be above paymasterStake\\n     * @param unstakeDelaySec minimum delay to withdraw the stake. must be above the global unstakeDelaySec\\n     * @param withdrawTime - first block timestamp where 'withdrawStake' will be callable, or zero if already locked\\n     * @dev sizes were chosen so that (deposit,staked) fit into one cell (used during handleOps)\\n     *    and the rest fit into a 2nd cell.\\n     *    112 bit allows for 2^15 eth\\n     *    64 bit for full timestamp\\n     *    32 bit allow 150 years for unstake delay\\n     */\\n    struct DepositInfo {\\n        uint112 deposit;\\n        bool staked;\\n        uint112 stake;\\n        uint32 unstakeDelaySec;\\n        uint64 withdrawTime;\\n    }\\n\\n    function getDepositInfo(address account) external view returns (DepositInfo memory info);\\n\\n    /// return the deposit (for gas payment) of the account\\n    function balanceOf(address account) external view returns (uint256);\\n\\n    /**\\n     * add to the deposit of the given account\\n     */\\n    function depositTo(address account) external payable;\\n\\n    /**\\n     * add to the account's stake - amount and delay\\n     * any pending unstake is first cancelled.\\n     * @param _unstakeDelaySec the new lock duration before the deposit can be withdrawn.\\n     */\\n    function addStake(uint32 _unstakeDelaySec) external payable;\\n\\n    /**\\n     * attempt to unlock the stake.\\n     * the value can be withdrawn (using withdrawStake) after the unstake delay.\\n     */\\n    function unlockStake() external;\\n\\n    /**\\n     * withdraw from the (unlocked) stake.\\n     * must first call unlockStake and wait for the unstakeDelay to pass\\n     * @param withdrawAddress the address to send withdrawn value.\\n     */\\n    function withdrawStake(address payable withdrawAddress) external;\\n\\n    /**\\n     * withdraw from the deposit.\\n     * @param withdrawAddress the address to send withdrawn value.\\n     * @param withdrawAmount the amount to withdraw.\\n     */\\n    function withdrawTo(address payable withdrawAddress, uint256 withdrawAmount) external;\\n}\\n\",\"keccak256\":\"0xf2a242b657ba0a1568022752a2b9e3bbf83edb5a980fdcc52c1258c7c8d90bd3\",\"license\":\"GPL-3.0-only\"},\"contracts/interfaces/IWallet.sol\":{\"content\":\"// SPDX-License-Identifier: GPL-3.0\\npragma solidity ^0.8.12;\\n\\nimport \\\"./UserOperation.sol\\\";\\n\\ninterface IWallet {\\n\\n    /**\\n     * Validate user's signature and nonce\\n     * the entryPoint will make the call to the recipient only if this validation call returns successfully.\\n     *\\n     * @dev Must validate caller is the entryPoint.\\n     *      Must validate the signature and nonce\\n     * @param userOp the operation that is about to be executed.\\n     * @param requestId hash of the user's request data. can be used as the basis for signature.\\n     * @param aggregator the aggregator used to validate the signature. NULL for non-aggregated signature wallets.\\n     * @param missingWalletFunds missing funds on the wallet's deposit in the entrypoint.\\n     *      This is the minimum amount to transfer to the sender(entryPoint) to be able to make the call.\\n     *      The excess is left as a deposit in the entrypoint, for future calls.\\n     *      can be withdrawn anytime using \\\"entryPoint.withdrawTo()\\\"\\n     *      In case there is a paymaster in the request (or the current deposit is high enough), this value will be zero.\\n     */\\n    function validateUserOp(UserOperation calldata userOp, bytes32 requestId, address aggregator, uint256 missingWalletFunds) external;\\n}\\n\",\"keccak256\":\"0x9faeb4f22e20c1f05ac617adf0a9b66bd5d32c32674fc227cdae6d11f8491e4f\",\"license\":\"GPL-3.0\"},\"contracts/interfaces/UserOperation.sol\":{\"content\":\"// SPDX-License-Identifier: GPL-3.0\\npragma solidity ^0.8.12;\\n\\n/* solhint-disable no-inline-assembly */\\n\\n    /**\\n     * User Operation struct\\n     * @param sender the sender account of this request\\n     * @param nonce unique value the sender uses to verify it is not a replay.\\n     * @param initCode if set, the account contract will be created by this constructor\\n     * @param callData the method call to execute on this account.\\n     * @param verificationGasLimit gas used for validateUserOp and validatePaymasterUserOp\\n     * @param preVerificationGas gas not calculated by the handleOps method, but added to the gas paid. Covers batch overhead.\\n     * @param maxFeePerGas same as EIP-1559 gas parameter\\n     * @param maxPriorityFeePerGas same as EIP-1559 gas parameter\\n     * @param paymasterAndData if set, this field hold the paymaster address and \\\"paymaster-specific-data\\\". the paymaster will pay for the transaction instead of the sender\\n     * @param signature sender-verified signature over the entire request, the EntryPoint address and the chain ID.\\n     */\\n    struct UserOperation {\\n\\n        address sender;\\n        uint256 nonce;\\n        bytes initCode;\\n        bytes callData;\\n        uint256 callGasLimit;\\n        uint256 verificationGasLimit;\\n        uint256 preVerificationGas;\\n        uint256 maxFeePerGas;\\n        uint256 maxPriorityFeePerGas;\\n        bytes paymasterAndData;\\n        bytes signature;\\n    }\\n\\nlibrary UserOperationLib {\\n\\n    function getSender(UserOperation calldata userOp) internal pure returns (address) {\\n        address data;\\n        //read sender from userOp, which is first userOp member (saves 800 gas...)\\n        assembly {data := calldataload(userOp)}\\n        return address(uint160(data));\\n    }\\n\\n    //relayer/miner might submit the TX with higher priorityFee, but the user should not\\n    // pay above what he signed for.\\n    function gasPrice(UserOperation calldata userOp) internal view returns (uint256) {\\n    unchecked {\\n        uint256 maxFeePerGas = userOp.maxFeePerGas;\\n        uint256 maxPriorityFeePerGas = userOp.maxPriorityFeePerGas;\\n        if (maxFeePerGas == maxPriorityFeePerGas) {\\n            //legacy mode (for networks that don't support basefee opcode)\\n            return maxFeePerGas;\\n        }\\n        return min(maxFeePerGas, maxPriorityFeePerGas + block.basefee);\\n    }\\n    }\\n\\n    function pack(UserOperation calldata userOp) internal pure returns (bytes memory ret) {\\n        //lighter signature scheme. must match UserOp.ts#packUserOp\\n        bytes calldata sig = userOp.signature;\\n        // copy directly the userOp from calldata up to (but not including) the signature.\\n        // this encoding depends on the ABI encoding of calldata, but is much lighter to copy\\n        // than referencing each field separately.\\n        assembly {\\n            let ofs := userOp\\n            let len := sub(sub(sig.offset, ofs), 32)\\n            ret := mload(0x40)\\n            mstore(0x40, add(ret, add(len, 32)))\\n            mstore(ret, len)\\n            calldatacopy(add(ret, 32), ofs, len)\\n        }\\n    }\\n\\n    function hash(UserOperation calldata userOp) internal pure returns (bytes32) {\\n        return keccak256(pack(userOp));\\n    }\\n\\n    function min(uint256 a, uint256 b) internal pure returns (uint256) {\\n        return a < b ? a : b;\\n    }\\n}\\n\",\"keccak256\":\"0x223214375bdcf5670f16cbe4697ce5eae0cd673760db92491ad37967fbb3a6d0\",\"license\":\"GPL-3.0\"},\"contracts/samples/SimpleWallet.sol\":{\"content\":\"// SPDX-License-Identifier: GPL-3.0\\npragma solidity ^0.8.12;\\n\\n/* solhint-disable avoid-low-level-calls */\\n/* solhint-disable no-inline-assembly */\\n/* solhint-disable reason-string */\\n\\nimport \\\"../core/BaseWallet.sol\\\";\\nimport \\\"@openzeppelin/contracts/utils/cryptography/ECDSA.sol\\\";\\n\\n/**\\n  * minimal wallet.\\n  *  this is sample minimal wallet.\\n  *  has execute, eth handling methods\\n  *  has a single signer that can send requests through the entryPoint.\\n  */\\ncontract SimpleWallet is BaseWallet {\\n    using ECDSA for bytes32;\\n    using UserOperationLib for UserOperation;\\n\\n    //explicit sizes of nonce, to fit a single storage cell with \\\"owner\\\"\\n    uint96 private _nonce;\\n    address public owner;\\n\\n    function nonce() public view virtual override returns (uint256) {\\n        return _nonce;\\n    }\\n\\n    function entryPoint() public view virtual override returns (IEntryPoint) {\\n        return _entryPoint;\\n    }\\n\\n    IEntryPoint private _entryPoint;\\n\\n    event EntryPointChanged(address indexed oldEntryPoint, address indexed newEntryPoint);\\n\\n    // solhint-disable-next-line no-empty-blocks\\n    receive() external payable {}\\n\\n    constructor(IEntryPoint anEntryPoint, address anOwner) {\\n        _entryPoint = anEntryPoint;\\n        owner = anOwner;\\n    }\\n\\n    modifier onlyOwner() {\\n        _onlyOwner();\\n        _;\\n    }\\n\\n    function _onlyOwner() internal view {\\n        //directly from EOA owner, or through the entryPoint (which gets redirected through execFromEntryPoint)\\n        require(msg.sender == owner || msg.sender == address(this), \\\"only owner\\\");\\n    }\\n\\n    /**\\n     * transfer eth value to a destination address\\n     */\\n    function transfer(address payable dest, uint256 amount) external onlyOwner {\\n        dest.transfer(amount);\\n    }\\n\\n    /**\\n     * execute a transaction (called directly from owner, not by entryPoint)\\n     */\\n    function exec(address dest, uint256 value, bytes calldata func) external onlyOwner {\\n        _call(dest, value, func);\\n    }\\n\\n    /**\\n     * execute a sequence of transaction\\n     */\\n    function execBatch(address[] calldata dest, bytes[] calldata func) external onlyOwner {\\n        require(dest.length == func.length, \\\"wrong array lengths\\\");\\n        for (uint256 i = 0; i < dest.length; i++) {\\n            _call(dest[i], 0, func[i]);\\n        }\\n    }\\n\\n    /**\\n     * change entry-point:\\n     * a wallet must have a method for replacing the entryPoint, in case the the entryPoint is\\n     * upgraded to a newer version.\\n     */\\n    function _updateEntryPoint(address newEntryPoint) internal override {\\n        emit EntryPointChanged(address(_entryPoint), newEntryPoint);\\n        _entryPoint = IEntryPoint(payable(newEntryPoint));\\n    }\\n\\n    function _requireFromAdmin() internal view override {\\n        _onlyOwner();\\n    }\\n\\n    /**\\n     * validate the userOp is correct.\\n     * revert if it doesn't.\\n     * - must only be called from the entryPoint.\\n     * - make sure the signature is of our supported signer.\\n     * - validate current nonce matches request nonce, and increment it.\\n     * - pay prefund, in case current deposit is not enough\\n     */\\n    function _requireFromEntryPoint() internal override view {\\n        require(msg.sender == address(entryPoint()), \\\"wallet: not from EntryPoint\\\");\\n    }\\n\\n    // called by entryPoint, only after validateUserOp succeeded.\\n    function execFromEntryPoint(address dest, uint256 value, bytes calldata func) external {\\n        _requireFromEntryPoint();\\n        _call(dest, value, func);\\n    }\\n\\n    /// implement template method of BaseWallet\\n    function _validateAndUpdateNonce(UserOperation calldata userOp) internal override {\\n        require(_nonce++ == userOp.nonce, \\\"wallet: invalid nonce\\\");\\n    }\\n\\n    /// implement template method of BaseWallet\\n    function _validateSignature(UserOperation calldata userOp, bytes32 requestId, address) internal view virtual override {\\n        bytes32 hash = requestId.toEthSignedMessageHash();\\n        require(owner == hash.recover(userOp.signature), \\\"wallet: wrong signature\\\");\\n    }\\n\\n    function _call(address target, uint256 value, bytes memory data) internal {\\n        (bool success, bytes memory result) = target.call{value : value}(data);\\n        if (!success) {\\n            assembly {\\n                revert(add(result, 32), mload(result))\\n            }\\n        }\\n    }\\n\\n    /**\\n     * check current wallet deposit in the entryPoint\\n     */\\n    function getDeposit() public view returns (uint256) {\\n        return entryPoint().balanceOf(address(this));\\n    }\\n\\n    /**\\n     * deposit more funds for this wallet in the entryPoint\\n     */\\n    function addDeposit() public payable {\\n\\n        (bool req,) = address(entryPoint()).call{value : msg.value}(\\\"\\\");\\n        require(req);\\n    }\\n\\n    /**\\n     * withdraw value from the wallet's deposit\\n     * @param withdrawAddress target to send to\\n     * @param amount to withdraw\\n     */\\n    function withdrawDepositTo(address payable withdrawAddress, uint256 amount) public onlyOwner {\\n        entryPoint().withdrawTo(withdrawAddress, amount);\\n    }\\n}\\n\\n\",\"keccak256\":\"0x72c5b94ae8e33d275c8b5e07e8333ac7c08f9c053459a466ce6c01ecd944f524\",\"license\":\"GPL-3.0\"}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b506040516113df3803806113df83398101604081905261002f9161008f565b600180546001600160a01b039384166001600160a01b031990911617905560008054919092166c01000000000000000000000000026001600160601b039091161790556100c9565b6001600160a01b038116811461008c57600080fd5b50565b600080604083850312156100a257600080fd5b82516100ad81610077565b60208401519092506100be81610077565b809150509250929050565b611307806100d86000396000f3fe6080604052600436106100cb5760003560e01c80638da5cb5b11610074578063b0d691fe1161004e578063b0d691fe14610235578063c399ec8814610260578063d0cb75fa1461027557600080fd5b80638da5cb5b14610181578063a9059cbb146101e8578063affed0e01461020857600080fd5b80634a58db19116100a55780634a58db19146101395780634d44560d1461014157806380c5c7d01461016157600080fd5b80630565bb67146100d75780630825d1fc146100f95780631b71bb6e1461011957600080fd5b366100d257005b600080fd5b3480156100e357600080fd5b506100f76100f2366004610f37565b610295565b005b34801561010557600080fd5b506100f7610114366004610fc0565b6102e4565b34801561012557600080fd5b506100f7610134366004611027565b61031f565b6100f7610333565b34801561014d57600080fd5b506100f761015c36600461104b565b6103be565b34801561016d57600080fd5b506100f761017c366004610f37565b61046d565b34801561018d57600080fd5b506000546101be906c01000000000000000000000000900473ffffffffffffffffffffffffffffffffffffffff1681565b60405173ffffffffffffffffffffffffffffffffffffffff90911681526020015b60405180910390f35b3480156101f457600080fd5b506100f761020336600461104b565b610475565b34801561021457600080fd5b506000546bffffffffffffffffffffffff165b6040519081526020016101df565b34801561024157600080fd5b5060015473ffffffffffffffffffffffffffffffffffffffff166101be565b34801561026c57600080fd5b506102276104c5565b34801561028157600080fd5b506100f76102903660046110bc565b61057b565b61029d61069f565b6102de848484848080601f01602080910402602001604051908101604052809392919081815260200183838082843760009201919091525061073c92505050565b50505050565b6102ec6107b9565b6102f784848461083a565b6103046040850185611128565b90506000036103165761031684610977565b6102de81610a3f565b610327610aaa565b61033081610ab2565b50565b600061035460015473ffffffffffffffffffffffffffffffffffffffff1690565b73ffffffffffffffffffffffffffffffffffffffff163460405160006040518083038185875af1925050503d80600081146103ab576040519150601f19603f3d011682016040523d82523d6000602084013e6103b0565b606091505b505090508061033057600080fd5b6103c661069f565b60015473ffffffffffffffffffffffffffffffffffffffff166040517f205c287800000000000000000000000000000000000000000000000000000000815273ffffffffffffffffffffffffffffffffffffffff848116600483015260248201849052919091169063205c287890604401600060405180830381600087803b15801561045157600080fd5b505af1158015610465573d6000803e3d6000fd5b505050505050565b61029d6107b9565b61047d61069f565b60405173ffffffffffffffffffffffffffffffffffffffff83169082156108fc029083906000818181858888f193505050501580156104c0573d6000803e3d6000fd5b505050565b60006104e660015473ffffffffffffffffffffffffffffffffffffffff1690565b6040517f70a0823100000000000000000000000000000000000000000000000000000000815230600482015273ffffffffffffffffffffffffffffffffffffffff91909116906370a0823190602401602060405180830381865afa158015610552573d6000803e3d6000fd5b505050506040513d601f19601f82011682018060405250810190610576919061118d565b905090565b61058361069f565b8281146105f1576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601360248201527f77726f6e67206172726179206c656e677468730000000000000000000000000060448201526064015b60405180910390fd5b60005b8381101561069857610686858583818110610611576106116111a6565b90506020020160208101906106269190611027565b600085858581811061063a5761063a6111a6565b905060200281019061064c9190611128565b8080601f01602080910402602001604051908101604052809392919081815260200183838082843760009201919091525061073c92505050565b8061069081611204565b9150506105f4565b5050505050565b6000546c01000000000000000000000000900473ffffffffffffffffffffffffffffffffffffffff163314806106d457503330145b61073a576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152600a60248201527f6f6e6c79206f776e65720000000000000000000000000000000000000000000060448201526064016105e8565b565b6000808473ffffffffffffffffffffffffffffffffffffffff168484604051610765919061123c565b60006040518083038185875af1925050503d80600081146107a2576040519150601f19603f3d011682016040523d82523d6000602084013e6107a7565b606091505b50915091508161069857805160208201fd5b60015473ffffffffffffffffffffffffffffffffffffffff16331461073a576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601b60248201527f77616c6c65743a206e6f742066726f6d20456e747279506f696e74000000000060448201526064016105e8565b6000610893836040517f19457468657265756d205369676e6564204d6573736167653a0a3332000000006020820152603c8101829052600090605c01604051602081830303815290604052805190602001209050919050565b90506108e36108a6610140860186611128565b8080601f0160208091040260200160405190810160405280939291908181526020018383808284376000920191909152508593925050610b409050565b6000546c01000000000000000000000000900473ffffffffffffffffffffffffffffffffffffffff9081169116146102de576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601760248201527f77616c6c65743a2077726f6e67207369676e617475726500000000000000000060448201526064016105e8565b600080546020830135916bffffffffffffffffffffffff909116908061099c83611277565b91906101000a8154816bffffffffffffffffffffffff02191690836bffffffffffffffffffffffff1602179055506bffffffffffffffffffffffff1614610330576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601560248201527f77616c6c65743a20696e76616c6964206e6f6e6365000000000000000000000060448201526064016105e8565b80156103305760405160009033907fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff90849084818181858888f193505050503d8060008114610698576040519150601f19603f3d011682016040523d82523d6000602084013e610698565b61073a61069f565b60015460405173ffffffffffffffffffffffffffffffffffffffff8084169216907f450909c1478d09248269d4ad4fa8cba61ca3f50faed58c7aedefa51c7f62b83a90600090a3600180547fffffffffffffffffffffffff00000000000000000000000000000000000000001673ffffffffffffffffffffffffffffffffffffffff92909216919091179055565b6000806000610b4f8585610b64565b91509150610b5c81610ba9565b509392505050565b6000808251604103610b9a5760208301516040840151606085015160001a610b8e87828585610dfd565b94509450505050610ba2565b506000905060025b9250929050565b6000816004811115610bbd57610bbd6112a2565b03610bc55750565b6001816004811115610bd957610bd96112a2565b03610c40576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601860248201527f45434453413a20696e76616c6964207369676e6174757265000000000000000060448201526064016105e8565b6002816004811115610c5457610c546112a2565b03610cbb576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601f60248201527f45434453413a20696e76616c6964207369676e6174757265206c656e6774680060448201526064016105e8565b6003816004811115610ccf57610ccf6112a2565b03610d5c576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152602260248201527f45434453413a20696e76616c6964207369676e6174757265202773272076616c60448201527f756500000000000000000000000000000000000000000000000000000000000060648201526084016105e8565b6004816004811115610d7057610d706112a2565b03610330576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152602260248201527f45434453413a20696e76616c6964207369676e6174757265202776272076616c60448201527f756500000000000000000000000000000000000000000000000000000000000060648201526084016105e8565b6000807f7fffffffffffffffffffffffffffffff5d576e7357a4501ddfe92f46681b20a0831115610e345750600090506003610f0c565b8460ff16601b14158015610e4c57508460ff16601c14155b15610e5d5750600090506004610f0c565b6040805160008082526020820180845289905260ff881692820192909252606081018690526080810185905260019060a0016020604051602081039080840390855afa158015610eb1573d6000803e3d6000fd5b50506040517fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe0015191505073ffffffffffffffffffffffffffffffffffffffff8116610f0557600060019250925050610f0c565b9150600090505b94509492505050565b73ffffffffffffffffffffffffffffffffffffffff8116811461033057600080fd5b60008060008060608587031215610f4d57600080fd5b8435610f5881610f15565b935060208501359250604085013567ffffffffffffffff80821115610f7c57600080fd5b818701915087601f830112610f9057600080fd5b813581811115610f9f57600080fd5b886020828501011115610fb157600080fd5b95989497505060200194505050565b60008060008060808587031215610fd657600080fd5b843567ffffffffffffffff811115610fed57600080fd5b8501610160818803121561100057600080fd5b935060208501359250604085013561101781610f15565b9396929550929360600135925050565b60006020828403121561103957600080fd5b813561104481610f15565b9392505050565b6000806040838503121561105e57600080fd5b823561106981610f15565b946020939093013593505050565b60008083601f84011261108957600080fd5b50813567ffffffffffffffff8111156110a157600080fd5b6020830191508360208260051b8501011115610ba257600080fd5b600080600080604085870312156110d257600080fd5b843567ffffffffffffffff808211156110ea57600080fd5b6110f688838901611077565b9096509450602087013591508082111561110f57600080fd5b5061111c87828801611077565b95989497509550505050565b60008083357fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe184360301811261115d57600080fd5b83018035915067ffffffffffffffff82111561117857600080fd5b602001915036819003821315610ba257600080fd5b60006020828403121561119f57600080fd5b5051919050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052603260045260246000fd5b7f4e487b7100000000000000000000000000000000000000000000000000000000600052601160045260246000fd5b60007fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff8203611235576112356111d5565b5060010190565b6000825160005b8181101561125d5760208186018101518583015201611243565b8181111561126c576000828501525b509190910192915050565b60006bffffffffffffffffffffffff808316818103611298576112986111d5565b6001019392505050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052602160045260246000fdfea2646970667358221220f60ebeab6f395f7f55d23c014a99497bede660719add8c7f40df5fe34a18a93464736f6c634300080f0033",
+  "deployedBytecode": "0x6080604052600436106100cb5760003560e01c80638da5cb5b11610074578063b0d691fe1161004e578063b0d691fe14610235578063c399ec8814610260578063d0cb75fa1461027557600080fd5b80638da5cb5b14610181578063a9059cbb146101e8578063affed0e01461020857600080fd5b80634a58db19116100a55780634a58db19146101395780634d44560d1461014157806380c5c7d01461016157600080fd5b80630565bb67146100d75780630825d1fc146100f95780631b71bb6e1461011957600080fd5b366100d257005b600080fd5b3480156100e357600080fd5b506100f76100f2366004610f37565b610295565b005b34801561010557600080fd5b506100f7610114366004610fc0565b6102e4565b34801561012557600080fd5b506100f7610134366004611027565b61031f565b6100f7610333565b34801561014d57600080fd5b506100f761015c36600461104b565b6103be565b34801561016d57600080fd5b506100f761017c366004610f37565b61046d565b34801561018d57600080fd5b506000546101be906c01000000000000000000000000900473ffffffffffffffffffffffffffffffffffffffff1681565b60405173ffffffffffffffffffffffffffffffffffffffff90911681526020015b60405180910390f35b3480156101f457600080fd5b506100f761020336600461104b565b610475565b34801561021457600080fd5b506000546bffffffffffffffffffffffff165b6040519081526020016101df565b34801561024157600080fd5b5060015473ffffffffffffffffffffffffffffffffffffffff166101be565b34801561026c57600080fd5b506102276104c5565b34801561028157600080fd5b506100f76102903660046110bc565b61057b565b61029d61069f565b6102de848484848080601f01602080910402602001604051908101604052809392919081815260200183838082843760009201919091525061073c92505050565b50505050565b6102ec6107b9565b6102f784848461083a565b6103046040850185611128565b90506000036103165761031684610977565b6102de81610a3f565b610327610aaa565b61033081610ab2565b50565b600061035460015473ffffffffffffffffffffffffffffffffffffffff1690565b73ffffffffffffffffffffffffffffffffffffffff163460405160006040518083038185875af1925050503d80600081146103ab576040519150601f19603f3d011682016040523d82523d6000602084013e6103b0565b606091505b505090508061033057600080fd5b6103c661069f565b60015473ffffffffffffffffffffffffffffffffffffffff166040517f205c287800000000000000000000000000000000000000000000000000000000815273ffffffffffffffffffffffffffffffffffffffff848116600483015260248201849052919091169063205c287890604401600060405180830381600087803b15801561045157600080fd5b505af1158015610465573d6000803e3d6000fd5b505050505050565b61029d6107b9565b61047d61069f565b60405173ffffffffffffffffffffffffffffffffffffffff83169082156108fc029083906000818181858888f193505050501580156104c0573d6000803e3d6000fd5b505050565b60006104e660015473ffffffffffffffffffffffffffffffffffffffff1690565b6040517f70a0823100000000000000000000000000000000000000000000000000000000815230600482015273ffffffffffffffffffffffffffffffffffffffff91909116906370a0823190602401602060405180830381865afa158015610552573d6000803e3d6000fd5b505050506040513d601f19601f82011682018060405250810190610576919061118d565b905090565b61058361069f565b8281146105f1576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601360248201527f77726f6e67206172726179206c656e677468730000000000000000000000000060448201526064015b60405180910390fd5b60005b8381101561069857610686858583818110610611576106116111a6565b90506020020160208101906106269190611027565b600085858581811061063a5761063a6111a6565b905060200281019061064c9190611128565b8080601f01602080910402602001604051908101604052809392919081815260200183838082843760009201919091525061073c92505050565b8061069081611204565b9150506105f4565b5050505050565b6000546c01000000000000000000000000900473ffffffffffffffffffffffffffffffffffffffff163314806106d457503330145b61073a576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152600a60248201527f6f6e6c79206f776e65720000000000000000000000000000000000000000000060448201526064016105e8565b565b6000808473ffffffffffffffffffffffffffffffffffffffff168484604051610765919061123c565b60006040518083038185875af1925050503d80600081146107a2576040519150601f19603f3d011682016040523d82523d6000602084013e6107a7565b606091505b50915091508161069857805160208201fd5b60015473ffffffffffffffffffffffffffffffffffffffff16331461073a576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601b60248201527f77616c6c65743a206e6f742066726f6d20456e747279506f696e74000000000060448201526064016105e8565b6000610893836040517f19457468657265756d205369676e6564204d6573736167653a0a3332000000006020820152603c8101829052600090605c01604051602081830303815290604052805190602001209050919050565b90506108e36108a6610140860186611128565b8080601f0160208091040260200160405190810160405280939291908181526020018383808284376000920191909152508593925050610b409050565b6000546c01000000000000000000000000900473ffffffffffffffffffffffffffffffffffffffff9081169116146102de576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601760248201527f77616c6c65743a2077726f6e67207369676e617475726500000000000000000060448201526064016105e8565b600080546020830135916bffffffffffffffffffffffff909116908061099c83611277565b91906101000a8154816bffffffffffffffffffffffff02191690836bffffffffffffffffffffffff1602179055506bffffffffffffffffffffffff1614610330576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601560248201527f77616c6c65743a20696e76616c6964206e6f6e6365000000000000000000000060448201526064016105e8565b80156103305760405160009033907fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff90849084818181858888f193505050503d8060008114610698576040519150601f19603f3d011682016040523d82523d6000602084013e610698565b61073a61069f565b60015460405173ffffffffffffffffffffffffffffffffffffffff8084169216907f450909c1478d09248269d4ad4fa8cba61ca3f50faed58c7aedefa51c7f62b83a90600090a3600180547fffffffffffffffffffffffff00000000000000000000000000000000000000001673ffffffffffffffffffffffffffffffffffffffff92909216919091179055565b6000806000610b4f8585610b64565b91509150610b5c81610ba9565b509392505050565b6000808251604103610b9a5760208301516040840151606085015160001a610b8e87828585610dfd565b94509450505050610ba2565b506000905060025b9250929050565b6000816004811115610bbd57610bbd6112a2565b03610bc55750565b6001816004811115610bd957610bd96112a2565b03610c40576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601860248201527f45434453413a20696e76616c6964207369676e6174757265000000000000000060448201526064016105e8565b6002816004811115610c5457610c546112a2565b03610cbb576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152601f60248201527f45434453413a20696e76616c6964207369676e6174757265206c656e6774680060448201526064016105e8565b6003816004811115610ccf57610ccf6112a2565b03610d5c576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152602260248201527f45434453413a20696e76616c6964207369676e6174757265202773272076616c60448201527f756500000000000000000000000000000000000000000000000000000000000060648201526084016105e8565b6004816004811115610d7057610d706112a2565b03610330576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152602260248201527f45434453413a20696e76616c6964207369676e6174757265202776272076616c60448201527f756500000000000000000000000000000000000000000000000000000000000060648201526084016105e8565b6000807f7fffffffffffffffffffffffffffffff5d576e7357a4501ddfe92f46681b20a0831115610e345750600090506003610f0c565b8460ff16601b14158015610e4c57508460ff16601c14155b15610e5d5750600090506004610f0c565b6040805160008082526020820180845289905260ff881692820192909252606081018690526080810185905260019060a0016020604051602081039080840390855afa158015610eb1573d6000803e3d6000fd5b50506040517fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe0015191505073ffffffffffffffffffffffffffffffffffffffff8116610f0557600060019250925050610f0c565b9150600090505b94509492505050565b73ffffffffffffffffffffffffffffffffffffffff8116811461033057600080fd5b60008060008060608587031215610f4d57600080fd5b8435610f5881610f15565b935060208501359250604085013567ffffffffffffffff80821115610f7c57600080fd5b818701915087601f830112610f9057600080fd5b813581811115610f9f57600080fd5b886020828501011115610fb157600080fd5b95989497505060200194505050565b60008060008060808587031215610fd657600080fd5b843567ffffffffffffffff811115610fed57600080fd5b8501610160818803121561100057600080fd5b935060208501359250604085013561101781610f15565b9396929550929360600135925050565b60006020828403121561103957600080fd5b813561104481610f15565b9392505050565b6000806040838503121561105e57600080fd5b823561106981610f15565b946020939093013593505050565b60008083601f84011261108957600080fd5b50813567ffffffffffffffff8111156110a157600080fd5b6020830191508360208260051b8501011115610ba257600080fd5b600080600080604085870312156110d257600080fd5b843567ffffffffffffffff808211156110ea57600080fd5b6110f688838901611077565b9096509450602087013591508082111561110f57600080fd5b5061111c87828801611077565b95989497509550505050565b60008083357fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe184360301811261115d57600080fd5b83018035915067ffffffffffffffff82111561117857600080fd5b602001915036819003821315610ba257600080fd5b60006020828403121561119f57600080fd5b5051919050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052603260045260246000fd5b7f4e487b7100000000000000000000000000000000000000000000000000000000600052601160045260246000fd5b60007fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff8203611235576112356111d5565b5060010190565b6000825160005b8181101561125d5760208186018101518583015201611243565b8181111561126c576000828501525b509190910192915050565b60006bffffffffffffffffffffffff808316818103611298576112986111d5565b6001019392505050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052602160045260246000fdfea2646970667358221220f60ebeab6f395f7f55d23c014a99497bede660719add8c7f40df5fe34a18a93464736f6c634300080f0033",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {
+      "updateEntryPoint(address)": {
+        "params": {
+          "newEntryPoint": "the new entrypoint to trust."
+        }
+      },
+      "withdrawDepositTo(address,uint256)": {
+        "params": {
+          "amount": "to withdraw",
+          "withdrawAddress": "target to send to"
+        }
+      }
+    },
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {
+      "addDeposit()": {
+        "notice": "deposit more funds for this wallet in the entryPoint"
+      },
+      "entryPoint()": {
+        "notice": "return the entryPoint used by this wallet. subclass should return the current entryPoint used by this wallet."
+      },
+      "exec(address,uint256,bytes)": {
+        "notice": "execute a transaction (called directly from owner, not by entryPoint)"
+      },
+      "execBatch(address[],bytes[])": {
+        "notice": "execute a sequence of transaction"
+      },
+      "getDeposit()": {
+        "notice": "check current wallet deposit in the entryPoint"
+      },
+      "nonce()": {
+        "notice": "return the wallet nonce. subclass should return a nonce value that is used both by _validateAndUpdateNonce, and by the external provider (to read the current nonce)"
+      },
+      "transfer(address,uint256)": {
+        "notice": "transfer eth value to a destination address"
+      },
+      "updateEntryPoint(address)": {
+        "notice": "expose an api to modify the entryPoint. must be called by current \"admin\" of the wallet."
+      },
+      "validateUserOp((address,uint256,bytes,bytes,uint256,uint256,uint256,uint256,uint256,bytes,bytes),bytes32,address,uint256)": {
+        "notice": "Validate user's signature and nonce. subclass doesn't override this method. instead, it should override the specific internal validation methods."
+      },
+      "withdrawDepositTo(address,uint256)": {
+        "notice": "withdraw value from the wallet's deposit"
+      }
+    },
+    "notice": "minimal wallet.  this is sample minimal wallet.  has execute, eth handling methods  has a single signer that can send requests through the entryPoint.",
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [
+      {
+        "astId": 11779,
+        "contract": "contracts/samples/SimpleWallet.sol:SimpleWallet",
+        "label": "_nonce",
+        "offset": 0,
+        "slot": "0",
+        "type": "t_uint96"
+      },
+      {
+        "astId": 11781,
+        "contract": "contracts/samples/SimpleWallet.sol:SimpleWallet",
+        "label": "owner",
+        "offset": 12,
+        "slot": "0",
+        "type": "t_address"
+      },
+      {
+        "astId": 11803,
+        "contract": "contracts/samples/SimpleWallet.sol:SimpleWallet",
+        "label": "_entryPoint",
+        "offset": 0,
+        "slot": "1",
+        "type": "t_contract(IEntryPoint)11017"
+      }
+    ],
+    "types": {
+      "t_address": {
+        "encoding": "inplace",
+        "label": "address",
+        "numberOfBytes": "20"
+      },
+      "t_contract(IEntryPoint)11017": {
+        "encoding": "inplace",
+        "label": "contract IEntryPoint",
+        "numberOfBytes": "20"
+      },
+      "t_uint96": {
+        "encoding": "inplace",
+        "label": "uint96",
+        "numberOfBytes": "12"
+      }
+    }
+  }
+}
