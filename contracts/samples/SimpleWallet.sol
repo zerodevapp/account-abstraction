@@ -5,16 +5,15 @@ pragma solidity ^0.8.12;
 /* solhint-disable no-inline-assembly */
 /* solhint-disable reason-string */
 
-import "hardhat/console.sol";
 import "../core/BaseWallet.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
 /**
- * minimal wallet.
- *  this is sample minimal wallet.
- *  has execute, eth handling methods
- *  has a single signer that can send requests through the entryPoint.
- */
+  * minimal wallet.
+  *  this is sample minimal wallet.
+  *  has execute, eth handling methods
+  *  has a single signer that can send requests through the entryPoint.
+  */
 contract SimpleWallet is BaseWallet {
     using ECDSA for bytes32;
     using UserOperationLib for UserOperation;
@@ -33,20 +32,14 @@ contract SimpleWallet is BaseWallet {
 
     IEntryPoint private _entryPoint;
 
-    event EntryPointChanged(
-        address indexed oldEntryPoint,
-        address indexed newEntryPoint
-    );
+    event EntryPointChanged(address indexed oldEntryPoint, address indexed newEntryPoint);
 
     // solhint-disable-next-line no-empty-blocks
     receive() external payable {}
 
     constructor(IEntryPoint anEntryPoint, address anOwner) {
-        console.log("BP1");
         _entryPoint = anEntryPoint;
-        console.log("BP2");
         owner = anOwner;
-        console.log("BP3");
     }
 
     modifier onlyOwner() {
@@ -56,10 +49,7 @@ contract SimpleWallet is BaseWallet {
 
     function _onlyOwner() internal view {
         //directly from EOA owner, or through the entryPoint (which gets redirected through execFromEntryPoint)
-        require(
-            msg.sender == owner || msg.sender == address(this),
-            "only owner"
-        );
+        require(msg.sender == owner || msg.sender == address(this), "only owner");
     }
 
     /**
@@ -72,21 +62,14 @@ contract SimpleWallet is BaseWallet {
     /**
      * execute a transaction (called directly from owner, not by entryPoint)
      */
-    function exec(
-        address dest,
-        uint256 value,
-        bytes calldata func
-    ) external onlyOwner {
+    function exec(address dest, uint256 value, bytes calldata func) external onlyOwner {
         _call(dest, value, func);
     }
 
     /**
      * execute a sequence of transaction
      */
-    function execBatch(address[] calldata dest, bytes[] calldata func)
-        external
-        onlyOwner
-    {
+    function execBatch(address[] calldata dest, bytes[] calldata func) external onlyOwner {
         require(dest.length == func.length, "wrong array lengths");
         for (uint256 i = 0; i < dest.length; i++) {
             _call(dest[i], 0, func[i]);
@@ -115,50 +98,29 @@ contract SimpleWallet is BaseWallet {
      * - validate current nonce matches request nonce, and increment it.
      * - pay prefund, in case current deposit is not enough
      */
-    function _requireFromEntryPoint() internal view override {
-        require(
-            msg.sender == address(entryPoint()),
-            "wallet: not from EntryPoint"
-        );
+    function _requireFromEntryPoint() internal override view {
+        require(msg.sender == address(entryPoint()), "wallet: not from EntryPoint");
     }
 
     // called by entryPoint, only after validateUserOp succeeded.
-    function execFromEntryPoint(
-        address dest,
-        uint256 value,
-        bytes calldata func
-    ) external {
+    function execFromEntryPoint(address dest, uint256 value, bytes calldata func) external {
         _requireFromEntryPoint();
         _call(dest, value, func);
     }
 
     /// implement template method of BaseWallet
-    function _validateAndUpdateNonce(UserOperation calldata userOp)
-        internal
-        override
-    {
+    function _validateAndUpdateNonce(UserOperation calldata userOp) internal override {
         require(_nonce++ == userOp.nonce, "wallet: invalid nonce");
     }
 
     /// implement template method of BaseWallet
-    function _validateSignature(
-        UserOperation calldata userOp,
-        bytes32 requestId,
-        address
-    ) internal view virtual override {
+    function _validateSignature(UserOperation calldata userOp, bytes32 requestId, address) internal view virtual override {
         bytes32 hash = requestId.toEthSignedMessageHash();
-        require(
-            owner == hash.recover(userOp.signature),
-            "wallet: wrong signature"
-        );
+        require(owner == hash.recover(userOp.signature), "wallet: wrong signature");
     }
 
-    function _call(
-        address target,
-        uint256 value,
-        bytes memory data
-    ) internal {
-        (bool success, bytes memory result) = target.call{value: value}(data);
+    function _call(address target, uint256 value, bytes memory data) internal {
+        (bool success, bytes memory result) = target.call{value : value}(data);
         if (!success) {
             assembly {
                 revert(add(result, 32), mload(result))
@@ -177,7 +139,8 @@ contract SimpleWallet is BaseWallet {
      * deposit more funds for this wallet in the entryPoint
      */
     function addDeposit() public payable {
-        (bool req, ) = address(entryPoint()).call{value: msg.value}("");
+
+        (bool req,) = address(entryPoint()).call{value : msg.value}("");
         require(req);
     }
 
@@ -186,10 +149,8 @@ contract SimpleWallet is BaseWallet {
      * @param withdrawAddress target to send to
      * @param amount to withdraw
      */
-    function withdrawDepositTo(address payable withdrawAddress, uint256 amount)
-        public
-        onlyOwner
-    {
+    function withdrawDepositTo(address payable withdrawAddress, uint256 amount) public onlyOwner {
         entryPoint().withdrawTo(withdrawAddress, amount);
     }
 }
+
