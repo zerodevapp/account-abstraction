@@ -1,6 +1,4 @@
 node_modules
-mnemonic.txt
-.env
 
 #Hardhat files
 cache

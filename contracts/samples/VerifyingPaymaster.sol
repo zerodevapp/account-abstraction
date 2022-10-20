@@ -5,7 +5,6 @@ pragma solidity ^0.8.12;
 
 import "../core/BasePaymaster.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
-import "hardhat/console.sol";
 
 /**
  * A sample paymaster that uses external service to decide whether to pay for the UserOp.
@@ -17,14 +16,13 @@ import "hardhat/console.sol";
  * - the wallet signs to prove identity and wallet ownership.
  */
 contract VerifyingPaymaster is BasePaymaster {
+
     using ECDSA for bytes32;
     using UserOperationLib for UserOperation;
 
     address public immutable verifyingSigner;
 
-    constructor(IEntryPoint _entryPoint, address _verifyingSigner)
-        BasePaymaster(_entryPoint)
-    {
+    constructor(IEntryPoint _entryPoint, address _verifyingSigner) BasePaymaster(_entryPoint) {
         verifyingSigner = _verifyingSigner;
     }
 
@@ -36,68 +34,40 @@ contract VerifyingPaymaster is BasePaymaster {
      * which will carry the signature itself.
      */
     function getHash(UserOperation calldata userOp)
-        public
-        pure
-        returns (bytes32)
-    {
+    public pure returns (bytes32) {
         //can't use userOp.hash(), since it contains also the paymasterAndData itself.
-        return
-            keccak256(
-                abi.encode(
-                    userOp.getSender(),
-                    userOp.nonce,
-                    keccak256(userOp.initCode),
-                    keccak256(userOp.callData),
-                    userOp.callGasLimit,
-                    userOp.verificationGasLimit,
-                    userOp.maxFeePerGas,
-                    userOp.maxPriorityFeePerGas
-                )
-            );
+        return keccak256(abi.encode(
+                userOp.getSender(),
+                userOp.nonce,
+                keccak256(userOp.initCode),
+                keccak256(userOp.callData),
+                userOp.callGasLimit,
+                userOp.verificationGasLimit,
+                userOp.preVerificationGas,
+                userOp.maxFeePerGas,
+                userOp.maxPriorityFeePerGas
+            ));
     }
 
     /**
      * verify our external signer signed this request.
      * the "paymasterAndData" is expected to be the paymaster and a signature over the entire request params
      */
-    function validatePaymasterUserOp(
-        UserOperation calldata userOp,
-        bytes32, /*requestId*/
-        uint256 requiredPreFund
-    ) external view override returns (bytes memory context) {
+    function validatePaymasterUserOp(UserOperation calldata userOp, bytes32 /*requestId*/, uint256 requiredPreFund)
+    external view override returns (bytes memory context) {
         (requiredPreFund);
 
-        console.log("sender: %s", userOp.getSender());
-        console.log("nonce: %s", userOp.nonce);
-        console.log("initCode:");
-        console.logBytes(userOp.initCode);
-        console.log("callData:");
-        console.logBytes(userOp.callData);
-        console.log("callGasLimit: %s", userOp.callGasLimit);
-        console.log("verificationGasLimit: %s", userOp.verificationGasLimit);
-        console.log("preVerificationGas: %s", userOp.preVerificationGas);
-        console.log("maxFeePerGas: %s", userOp.maxFeePerGas);
-        console.log("maxPriorityFeePerGas: %s", userOp.maxPriorityFeePerGas);
-
         bytes32 hash = getHash(userOp);
-        console.log("hash is:");
-        console.logBytes32(hash);
         bytes calldata paymasterAndData = userOp.paymasterAndData;
         uint256 sigLength = paymasterAndData.length - 20;
         //ECDSA library supports both 64 and 65-byte long signatures.
         // we only "require" it here so that the revert reason on invalid signature will be of "VerifyingPaymaster", and not "ECDSA"
-        require(
-            sigLength == 64 || sigLength == 65,
-            "VerifyingPaymaster: invalid signature length in paymasterAndData"
-        );
-        require(
-            verifyingSigner ==
-                hash.toEthSignedMessageHash().recover(paymasterAndData[20:]),
-            "VerifyingPaymaster: wrong signature"
-        );
+        require(sigLength == 64 || sigLength == 65, "VerifyingPaymaster: invalid signature length in paymasterAndData");
+        require(verifyingSigner == hash.toEthSignedMessageHash().recover(paymasterAndData[20:]), "VerifyingPaymaster: wrong signature");
 
         //no need for other on-chain validation: entire UserOp should have been checked
         // by the external service prior to signing it.
         return "";
     }
+
 }
