@@ -2,6 +2,7 @@ import * as dotenv from 'dotenv' // see https://github.com/motdotla/dotenv#how-d
 dotenv.config()
 
 import '@nomiclabs/hardhat-waffle'
+import "@nomiclabs/hardhat-ethers";
 import '@typechain/hardhat'
 import { HardhatUserConfig } from 'hardhat/config'
 import 'hardhat-deploy'
@@ -36,6 +37,11 @@ const config: HardhatUserConfig = {
     settings: {
       optimizer: { enabled: true, runs: 1000000 }
     }
+  },
+  namedAccounts: {
+    deployer: {
+      dev: '0x90F79bf6EB2c4f870365E785982E1f101E93b906',
+    },
   },
   networks: {
     dev: {
