@@ -1,7 +1,7 @@
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
 import { DeployFunction } from 'hardhat-deploy/types'
 import { Create2Factory } from '../src/Create2Factory'
-import { ethers } from 'hardhat'
+import { ethers, hardhatArguments } from 'hardhat'
 
 const UNSTAKE_DELAY_SEC = 86400
 const PAYMASTER_STAKE = ethers.utils.parseEther('1')
@@ -11,31 +11,55 @@ const deployEntryPoint: DeployFunction = async function (hre: HardhatRuntimeEnvi
   const from = await provider.getSigner().getAddress()
   await new Create2Factory(ethers.provider).deployFactory()
 
-  const ret = await hre.deployments.deploy(
-    'EntryPoint', {
+  const entryPoint = await hre.deployments.deploy(
+    'EntryPoint',
+    {
       from,
       args: [PAYMASTER_STAKE, UNSTAKE_DELAY_SEC],
-      gasLimit: 4e6,
       deterministicDeployment: true
     })
-  console.log('==entrypoint addr=', ret.address)
-  const entryPointAddress = ret.address
+  console.log('==EntryPoint addr=', entryPoint.address)
 
-  const w = await hre.deployments.deploy(
-    'SimpleWallet', {
+  const simpleWalletDeployer = await hre.deployments.deploy(
+    'SimpleWalletDeployer',
+    {
       from,
-      args: [entryPointAddress, from],
-      gasLimit: 2e6,
       deterministicDeployment: true
     })
+  console.log('==SimpleWalletDeployer addr=', simpleWalletDeployer.address)
 
-  console.log('== wallet=', w.address)
+  const { paymasterOwner } = (await hre.getNamedAccounts())
+  const paymasterOwnerSigner = await ethers.getSigner(paymasterOwner)
 
-  const t = await hre.deployments.deploy('TestCounter', {
-    from,
-    deterministicDeployment: true
+  const verifyingPaymaster = await hre.deployments.deploy(
+    'VerifyingPaymaster',
+    {
+      from: paymasterOwner,
+      args: [entryPoint.address, paymasterOwner],
+    })
+  console.log('==VerifyingPaymaster addr=', verifyingPaymaster.address)
+  console.log('==VerifyingPaymaster owner=', paymasterOwner)
+
+  const vpContract = (await ethers.getContractAt('VerifyingPaymaster', verifyingPaymaster.address)).connect(paymasterOwnerSigner)
+
+  // stake and deposit for the paymaster
+  let tx = await vpContract.addStake(0, {
+    value: PAYMASTER_STAKE,
   })
-  console.log('==testCounter=', t.address)
+  await tx.wait()
+
+  tx = await vpContract.deposit({
+    value: PAYMASTER_STAKE,
+  })
+  await tx.wait()
+
+  const testToken = await hre.deployments.deploy(
+    'TestToken',
+    {
+      from,
+      args: [0],
+    })
+  console.log('==TestToken addr=', testToken.address)
 }
 
 export default deployEntryPoint
