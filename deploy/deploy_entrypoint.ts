@@ -4,7 +4,10 @@ import { Create2Factory } from '../src/Create2Factory'
 import { ethers, hardhatArguments } from 'hardhat'
 
 const UNSTAKE_DELAY_SEC = 86400
-const PAYMASTER_STAKE = ethers.utils.parseEther('1')
+// This may be too low for production, but doing this for now since
+// we don't have that much testnet ETH.
+const PAYMASTER_STAKE = ethers.utils.parseEther('0.01')
+const PAYMASTER_DEPOSIT = ethers.utils.parseEther('0.1')
 
 const deployEntryPoint: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const provider = ethers.provider
@@ -49,7 +52,7 @@ const deployEntryPoint: DeployFunction = async function (hre: HardhatRuntimeEnvi
   await tx.wait()
 
   tx = await vpContract.deposit({
-    value: PAYMASTER_STAKE,
+    value: PAYMASTER_DEPOSIT,
   })
   await tx.wait()
 

@@ -8,6 +8,9 @@ import 'solidity-coverage'
 
 import * as fs from 'fs'
 
+import * as dotenv from 'dotenv'
+dotenv.config()
+
 const mnemonicFileName = process.env.MNEMONIC_FILE ?? `${process.env.HOME}/.secret/testnet-mnemonic.txt`
 let mnemonic = 'test '.repeat(11) + 'junk'
 if (fs.existsSync(mnemonicFileName)) { mnemonic = fs.readFileSync(mnemonicFileName, 'ascii') }
@@ -40,12 +43,17 @@ const config: HardhatUserConfig = {
     localgeth: { url: 'http://localgeth:8545' },
     goerli: getNetwork('goerli'),
     proxy: getNetwork1('http://localhost:8545'),
-    kovan: getNetwork('kovan')
+    kovan: getNetwork('kovan'),
+    mumbai: {
+      url: `https://polygon-mumbai.infura.io/v3/${process.env.INFURA_ID}`,
+      accounts: [process.env.MUMBAI_DEPLOYER_PRIVATE_KEY!],
+    },
   },
   namedAccounts: {
     paymasterOwner: {
       // Use the third account as paymaster owner/verifier on test networks
       default: 3,
+      mumbai: `privatekey://${process.env.MUMBAI_PAYMASTER_OWNER_PRIVATE_KEY!}`,
     }
   },
   mocha: {
