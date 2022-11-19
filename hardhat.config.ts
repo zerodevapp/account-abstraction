@@ -48,12 +48,18 @@ const config: HardhatUserConfig = {
       url: `https://polygon-mumbai.infura.io/v3/${process.env.INFURA_ID}`,
       accounts: [process.env.MUMBAI_DEPLOYER_PRIVATE_KEY!],
     },
+    polygon: {
+      url: `
+      https://polygon-mainnet.infura.io/v3/${process.env.INFURA_ID}`,
+      accounts: [process.env.POLYGON_PRIVATE_KEY!],
+    },
   },
   namedAccounts: {
     paymasterOwner: {
       // Use the third account as paymaster owner/verifier on test networks
       default: 3,
       mumbai: `privatekey://${process.env.MUMBAI_PAYMASTER_OWNER_PRIVATE_KEY!}`,
+      polygon: `privatekey://${process.env.MUMBAI_PAYMASTER_OWNER_PRIVATE_KEY!}`,
     }
   },
   mocha: {

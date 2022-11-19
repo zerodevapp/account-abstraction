@@ -55,14 +55,6 @@ const deployEntryPoint: DeployFunction = async function (hre: HardhatRuntimeEnvi
     value: PAYMASTER_DEPOSIT,
   })
   await tx.wait()
-
-  const testToken = await hre.deployments.deploy(
-    'TestToken',
-    {
-      from,
-      args: [0],
-    })
-  console.log('==TestToken addr=', testToken.address)
 }
 
 export default deployEntryPoint
