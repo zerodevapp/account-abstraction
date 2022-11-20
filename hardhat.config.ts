@@ -55,7 +55,6 @@ const config: HardhatUserConfig = {
     dev: { url: 'http://localhost:8545' },
     // github action starts localgeth service, for gas calculations
     localgeth: { url: 'http://localgeth:8545' },
-    goerli: getNetwork('goerli'),
     proxy: getNetwork1('http://localhost:8545'),
     kovan: getNetwork('kovan'),
     mumbai: {
@@ -63,17 +62,18 @@ const config: HardhatUserConfig = {
       accounts: [process.env.MUMBAI_DEPLOYER_PRIVATE_KEY!],
     },
     polygon: {
-      url: `
-      https://polygon-mainnet.infura.io/v3/${process.env.INFURA_ID}`,
-      accounts: [process.env.POLYGON_PRIVATE_KEY!],
+      url: `https://polygon-mainnet.infura.io/v3/${process.env.INFURA_ID}`,
+      accounts: [process.env.DEPLOYER_PRIVATE_KEY!],
+    },
+    goerli: {
+      url: `https://goerli.infura.io/v3/${process.env.INFURA_ID}`,
+      accounts: [process.env.DEPLOYER_PRIVATE_KEY!, process.env.MUMBAI_PAYMASTER_OWNER_PRIVATE_KEY!],
     },
   },
   namedAccounts: {
     paymasterOwner: {
-      // Use the third account as paymaster owner/verifier on test networks
-      default: 3,
-      mumbai: `privatekey://${process.env.MUMBAI_PAYMASTER_OWNER_PRIVATE_KEY!}`,
-      polygon: `privatekey://${process.env.MUMBAI_PAYMASTER_OWNER_PRIVATE_KEY!}`,
+      default: 1,
+      // default: `privatekey://${process.env.MUMBAI_PAYMASTER_OWNER_PRIVATE_KEY!}`,
     }
   },
   mocha: {

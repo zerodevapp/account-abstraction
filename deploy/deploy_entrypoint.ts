@@ -3,8 +3,8 @@ import { DeployFunction } from 'hardhat-deploy/types'
 import { Create2Factory } from '../src/Create2Factory'
 import { ethers } from 'hardhat'
 
-const PAYMASTER_STAKE = ethers.utils.parseEther('0.01')
-const PAYMASTER_DEPOSIT = ethers.utils.parseEther('0.01')
+const PAYMASTER_STAKE = ethers.utils.parseEther('0.001')
+const PAYMASTER_DEPOSIT = ethers.utils.parseEther('0.1')
 
 const deployEntryPoint: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const provider = ethers.provider
@@ -44,15 +44,17 @@ const deployEntryPoint: DeployFunction = async function (hre: HardhatRuntimeEnvi
   const vpContract = (await ethers.getContractAt('VerifyingPaymaster', verifyingPaymaster.address)).connect(paymasterOwnerSigner)
 
   // stake and deposit for the paymaster
-  let tx = await vpContract.addStake(0, {
+  let tx = await vpContract.addStake(1, {
     value: PAYMASTER_STAKE,
   })
   await tx.wait()
+  console.log("Paymaster staked")
 
   tx = await vpContract.deposit({
     value: PAYMASTER_DEPOSIT,
   })
   await tx.wait()
+  console.log("Paymaster deposited")
 }
 
 export default deployEntryPoint
