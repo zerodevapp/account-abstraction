@@ -1,13 +1,10 @@
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
 import { DeployFunction } from 'hardhat-deploy/types'
 import { Create2Factory } from '../src/Create2Factory'
-import { ethers, hardhatArguments } from 'hardhat'
+import { ethers } from 'hardhat'
 
-const UNSTAKE_DELAY_SEC = 86400
-// This may be too low for production, but doing this for now since
-// we don't have that much testnet ETH.
 const PAYMASTER_STAKE = ethers.utils.parseEther('0.01')
-const PAYMASTER_DEPOSIT = ethers.utils.parseEther('0.1')
+const PAYMASTER_DEPOSIT = ethers.utils.parseEther('0.01')
 
 const deployEntryPoint: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const provider = ethers.provider
@@ -18,7 +15,8 @@ const deployEntryPoint: DeployFunction = async function (hre: HardhatRuntimeEnvi
     'EntryPoint',
     {
       from,
-      args: [PAYMASTER_STAKE, UNSTAKE_DELAY_SEC],
+      args: [],
+      gasLimit: 6e6,
       deterministicDeployment: true
     })
   console.log('==EntryPoint addr=', entryPoint.address)

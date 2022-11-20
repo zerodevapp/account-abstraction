@@ -25,7 +25,8 @@ abstract contract BasePaymaster is IPaymaster, Ownable {
         entryPoint = _entryPoint;
     }
 
-    function validatePaymasterUserOp(UserOperation calldata userOp, bytes32 requestId, uint256 maxCost) external virtual override returns (bytes memory context);
+    function validatePaymasterUserOp(UserOperation calldata userOp, bytes32 requestId, uint256 maxCost)
+    external virtual override returns (bytes memory context, uint256 deadline);
 
     function postOp(PostOpMode mode, bytes calldata context, uint256 actualGasCost) external override {
         _requireFromEntryPoint();
@@ -69,10 +70,10 @@ abstract contract BasePaymaster is IPaymaster, Ownable {
     /**
      * add stake for this paymaster.
      * This method can also carry eth value to add to the current stake.
-     * @param extraUnstakeDelaySec - set the stake to the entrypoint's default unstakeDelay plus this value.
+     * @param unstakeDelaySec - the unstake delay for this paymaster. Can only be increased.
      */
-    function addStake(uint32 extraUnstakeDelaySec) external payable onlyOwner {
-        entryPoint.addStake{value : msg.value}(entryPoint.unstakeDelaySec() + extraUnstakeDelaySec);
+    function addStake(uint32 unstakeDelaySec) external payable onlyOwner {
+        entryPoint.addStake{value : msg.value}(unstakeDelaySec);
     }
 
     /**
