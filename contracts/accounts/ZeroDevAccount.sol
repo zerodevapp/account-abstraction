@@ -11,12 +11,17 @@ contract ZeroDevAccount is BaseAccount {
     using ECDSA for bytes32;
 
     event PersonalEntryPointChanged(address indexed oldEntryPoint, address indexed newEntryPoint);
+    event PluginRegistered(address indexed plugin);
+    event PluginDeregistered(address indexed plugin);
 
     bytes4 public constant PLUGIN_SELECTOR = bytes4(keccak256("zerodev.plugins"));
 
     //explicit sizes of nonce, to fit a single storage cell with "owner"
     uint96 private _nonce;
     address public owner;
+
+    // A set of registered plugins
+    mapping(address => bool) plugins;
 
     // By default, the entrypoint in the global registry is used.
     // However, to guard against the attack where a malicious entrypoint
@@ -63,6 +68,31 @@ contract ZeroDevAccount is BaseAccount {
         }
     }
 
+    function registerPlugin(address plugin) external {
+        emit PluginRegistered(plugin);
+        plugins[plugin] = true;
+    }
+
+    function deregisterPlugin(address plugin) external {
+        emit PluginDeregistered(plugin);
+        delete plugins[plugin];
+    }
+
+    // This function can only be called by itself.  It's not the most
+    // gas-efficient way but it simplifies the API since this call can
+    // be part of `execBatch`.
+    // This function primarily exists to make it possible for plugins
+    // to execute complex logic for the user, in case batch call doesn't
+    // suffice.
+    // function execDelegateCall(address delegateTo, address target, uint256 value, bytes memory data) external onlySelf {
+    //     (bool success, bytes memory result) = delegateTo.delegatecall{value : value}(data);
+    //     if (!success) {
+    //         assembly {
+    //             revert(add(result, 32), mload(result))
+    //         }
+    //     }
+    // }
+
     function _call(address target, uint256 value, bytes memory data) internal {
         (bool success, bytes memory result) = target.call{value : value}(data);
         if (!success) {
@@ -81,15 +111,16 @@ contract ZeroDevAccount is BaseAccount {
             return 0;
         } else {
             // If the signature is wrong, we check if this is a plugin op
-            IPlugin plugin = _extractPlugin(userOp.signature);
-            return plugin.validateSignature(userOp, userOpHash, aggregator);
+            (address plugin, bytes memory pluginSig) = _parsePluginSignature(userOp.signature);
+            require(plugins[plugin], "account: plugin not registered");
+            return IPlugin(plugin).validateSignature(userOp, userOpHash, pluginSig, aggregator);
         }
     }
 
-    function _extractPlugin(bytes calldata signature) internal pure returns (IPlugin) {
-        (bytes4 prefix, address plugin) = abi.decode(signature, (bytes4, address));
+    function _parsePluginSignature(bytes calldata signature) internal pure returns (address, bytes memory) {
+        (bytes4 prefix, address plugin, bytes memory pluginSig) = abi.decode(signature, (bytes4, address, bytes));
         require(prefix == PLUGIN_SELECTOR, "account: invalid signature");
-        return IPlugin(plugin);
+        return (plugin, pluginSig);
     }
 
 }

@@ -4,6 +4,6 @@ pragma solidity ^0.8.15;
 import './UserOperation.sol';
 
 interface IPlugin {
-    function validateSignature(UserOperation calldata userOp, bytes32 userOpHash, address aggregator)
+    function validateSignature(UserOperation calldata userOp, bytes32 userOpHash, bytes calldata pluginSig, address aggregator)
         external returns (uint256 deadline);
 }
