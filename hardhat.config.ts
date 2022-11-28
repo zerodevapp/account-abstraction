@@ -69,6 +69,10 @@ const config: HardhatUserConfig = {
       url: `https://goerli.infura.io/v3/${process.env.INFURA_ID}`,
       accounts: [process.env.DEPLOYER_PRIVATE_KEY!, process.env.MUMBAI_PAYMASTER_OWNER_PRIVATE_KEY!],
     },
+    fuji: {
+      url: `https://avalanche-fuji.infura.io/v3/${process.env.INFURA_ID}`,
+      accounts: [process.env.DEPLOYER_PRIVATE_KEY!, process.env.MUMBAI_PAYMASTER_OWNER_PRIVATE_KEY!],
+    },
   },
   namedAccounts: {
     paymasterOwner: {

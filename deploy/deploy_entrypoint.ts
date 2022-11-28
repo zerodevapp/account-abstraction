@@ -4,7 +4,7 @@ import { Create2Factory } from '../src/Create2Factory'
 import { ethers } from 'hardhat'
 
 const PAYMASTER_STAKE = ethers.utils.parseEther('0.001')
-const PAYMASTER_DEPOSIT = ethers.utils.parseEther('0.1')
+const PAYMASTER_DEPOSIT = ethers.utils.parseEther('1')
 
 const deployEntryPoint: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const provider = ethers.provider
