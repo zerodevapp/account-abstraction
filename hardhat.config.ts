@@ -59,7 +59,7 @@ const config: HardhatUserConfig = {
     kovan: getNetwork('kovan'),
     mumbai: {
       url: `https://polygon-mumbai.infura.io/v3/${process.env.INFURA_ID}`,
-      accounts: [process.env.MUMBAI_DEPLOYER_PRIVATE_KEY!],
+      accounts: [process.env.DEPLOYER_PRIVATE_KEY!, process.env.MUMBAI_PAYMASTER_OWNER_PRIVATE_KEY!],
     },
     polygon: {
       url: `https://polygon-mainnet.infura.io/v3/${process.env.INFURA_ID}`,

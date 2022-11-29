@@ -68,10 +68,11 @@ contract SimpleWallet is BaseWallet {
     /**
      * execute a sequence of transaction
      */
-    function execBatch(address[] calldata dest, bytes[] calldata func) external onlyOwner {
-        require(dest.length == func.length, "wrong array lengths");
+    function execBatch(address[] calldata dest, uint256[] calldata value, bytes[] calldata func) external onlyOwner {
+        require(dest.length == func.length, "wrong func array lengths");
+        require(dest.length == value.length, "wrong value array lengths");
         for (uint256 i = 0; i < dest.length; i++) {
-            _call(dest[i], 0, func[i]);
+            _call(dest[i], value[i], func[i]);
         }
     }
 
