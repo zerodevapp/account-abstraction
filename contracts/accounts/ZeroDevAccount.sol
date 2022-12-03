@@ -30,6 +30,23 @@ contract ZeroDevAccount is BaseAccount {
     IEntryPoint public personalEntryPoint;
     IEntryPointRegistry public entryPointRegistry;
 
+    modifier onlyOwner() {
+        _onlyOwner();
+        _;
+    }
+
+    function _onlyOwner() internal view {
+        //directly from EOA owner, or through the entryPoint (which gets redirected through execFromEntryPoint)
+        require(msg.sender == owner || msg.sender == address(this), "account: only owner");
+    }
+
+    // solhint-disable-next-line no-empty-blocks
+    receive() external payable {}
+
+    constructor(address anOwner) {
+        owner = anOwner;
+    }
+
     function nonce() public view virtual override returns (uint256) {
         return _nonce;
     }
@@ -52,6 +69,20 @@ contract ZeroDevAccount is BaseAccount {
 
     function _requireFromEntryPointOrOwner() internal view {
         require(msg.sender == address(entryPoint()) || msg.sender == address(owner), "account: not from EntryPoint or owner");
+    }
+
+    /**
+     * transfer eth value to a destination address
+     */
+    function transfer(address payable dest, uint256 amount) external onlyOwner {
+        dest.transfer(amount);
+    }
+
+    /**
+     * execute a transaction (called directly from owner, not by entryPoint)
+     */
+    function exec(address dest, uint256 value, bytes calldata func) external onlyOwner {
+        _call(dest, value, func);
     }
 
     // The primary interface for executing transactions
@@ -124,3 +155,4 @@ contract ZeroDevAccount is BaseAccount {
     }
 
 }
+ 
