@@ -21,7 +21,7 @@ contract ZeroDevAccount is BaseAccount {
     address public owner;
 
     // A set of registered plugins
-    mapping(address => bool) plugins;
+    mapping(address => bool) public plugins;
 
     // By default, the entrypoint in the global registry is used.
     // However, to guard against the attack where a malicious entrypoint
@@ -43,8 +43,9 @@ contract ZeroDevAccount is BaseAccount {
     // solhint-disable-next-line no-empty-blocks
     receive() external payable {}
 
-    constructor(address anOwner) {
-        owner = anOwner;
+    constructor(address _entryPointRegistry, address _owner) {
+        entryPointRegistry = IEntryPointRegistry(_entryPointRegistry);
+        owner = _owner;
     }
 
     function nonce() public view virtual override returns (uint256) {
@@ -136,9 +137,11 @@ contract ZeroDevAccount is BaseAccount {
     function _validateSignature(UserOperation calldata userOp, bytes32 userOpHash, address aggregator)
     internal override virtual returns (uint256 deadline) {
         bytes32 hash = userOpHash.toEthSignedMessageHash();
+
+        // 65 is the ECDSA signature length
         //ignore signature mismatch of from==ZERO_ADDRESS (for eth_callUserOp validation purposes)
         // solhint-disable-next-line avoid-tx-origin
-        if (owner == hash.recover(userOp.signature) || tx.origin == address(0)) {
+        if ((userOp.signature.length == 65 && owner == hash.recover(userOp.signature)) || tx.origin == address(0)) {
             return 0;
         } else {
             // If the signature is wrong, we check if this is a plugin op
@@ -148,7 +151,7 @@ contract ZeroDevAccount is BaseAccount {
         }
     }
 
-    function _parsePluginSignature(bytes calldata signature) internal pure returns (address, bytes memory) {
+    function _parsePluginSignature(bytes calldata signature) internal view returns (address, bytes memory) {
         (bytes4 prefix, address plugin, bytes memory pluginSig) = abi.decode(signature, (bytes4, address, bytes));
         require(prefix == PLUGIN_SELECTOR, "account: invalid signature");
         return (plugin, pluginSig);
