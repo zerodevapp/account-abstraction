@@ -15,6 +15,11 @@ const mnemonicFileName = process.env.MNEMONIC_FILE ?? `${process.env.HOME}/.secr
 let mnemonic = 'test '.repeat(11) + 'junk'
 if (fs.existsSync(mnemonicFileName)) { mnemonic = fs.readFileSync(mnemonicFileName, 'ascii') }
 
+// Set up dummy values to avoid github test runs from failing
+const DEPLOYER_PRIVATE_KEY = process.env.DEPLOYER_PRIVATE_KEY ?? ''
+const MUMBAI_DEPLOYER_PRIVATE_KEY = process.env.MUMBAI_DEPLOYER_PRIVATE_KEY ?? ''
+const MUMBAI_PAYMASTER_OWNER_PRIVATE_KEY = process.env.MUMBAI_PAYMASTER_OWNER_PRIVATE_KEY ?? ''
+
 function getNetwork1(url: string): { url: string, accounts: { mnemonic: string } } {
   return {
     url,
@@ -59,15 +64,15 @@ const config: HardhatUserConfig = {
     kovan: getNetwork('kovan'),
     mumbai: {
       url: `https://polygon-mumbai.infura.io/v3/${process.env.INFURA_ID}`,
-      accounts: [process.env.MUMBAI_DEPLOYER_PRIVATE_KEY!],
+      accounts: [MUMBAI_DEPLOYER_PRIVATE_KEY],
     },
     polygon: {
       url: `https://polygon-mainnet.infura.io/v3/${process.env.INFURA_ID}`,
-      accounts: [process.env.DEPLOYER_PRIVATE_KEY!],
+      accounts: [DEPLOYER_PRIVATE_KEY],
     },
     goerli: {
       url: `https://goerli.infura.io/v3/${process.env.INFURA_ID}`,
-      accounts: [process.env.DEPLOYER_PRIVATE_KEY!, process.env.MUMBAI_PAYMASTER_OWNER_PRIVATE_KEY!],
+      accounts: [DEPLOYER_PRIVATE_KEY, MUMBAI_PAYMASTER_OWNER_PRIVATE_KEY],
     },
   },
   namedAccounts: {
