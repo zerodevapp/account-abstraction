@@ -1,11 +1,15 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.15;
 
+/* solhint-disable avoid-low-level-calls */
+/* solhint-disable no-inline-assembly */
+/* solhint-disable reason-string */
+
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
-import '../core/BaseAccount.sol';
-import '../interfaces/IEntryPointRegistry.sol';
-import '../interfaces/IPlugin.sol';
+import "../core/BaseAccount.sol";
+import "../interfaces/IEntryPointRegistry.sol";
+import "../interfaces/IPlugin.sol";
 
 contract ZeroDevAccount is BaseAccount {
     using ECDSA for bytes32;
@@ -69,7 +73,7 @@ contract ZeroDevAccount is BaseAccount {
     }
 
     function _requireFromEntryPointOrOwner() internal view {
-        require(msg.sender == address(entryPoint()) || msg.sender == address(owner), "account: not from EntryPoint or owner");
+        require(msg.sender == address(entryPoint()) || msg.sender == address(owner), "account: need EntryPoint/owner");
     }
 
     /**
@@ -89,11 +93,11 @@ contract ZeroDevAccount is BaseAccount {
     // The primary interface for executing transactions
     function execBatch(address[] calldata targets, uint256[] calldata values, bytes[] calldata datas) external {
         _requireFromEntryPointOrOwner();
-        require(targets.length == datas.length, "account: wrong data array lengths");
+        require(targets.length == datas.length, "account: wrong datas length");
         // As an optimization, we allow the values array to be empty if none of
         // calls in the batch specifies a value.  If any specifies a value,
         // however, all must.
-        require(targets.length == values.length || values.length == 0, "account: wrong value array lengths");
+        require(targets.length == values.length || values.length == 0, "account: wrong values length");
 
         for (uint256 i = 0; i < targets.length; i++) {
             _call(targets[i], values.length == 0 ? 0 : values[i], datas[i]);
