@@ -3,7 +3,7 @@ import '@typechain/hardhat'
 import { HardhatUserConfig } from 'hardhat/config'
 import 'hardhat-deploy'
 import '@nomiclabs/hardhat-etherscan'
-import ethers from 'ethers'
+import { ethers } from 'ethers'
 
 import 'solidity-coverage'
 
