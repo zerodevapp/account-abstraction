@@ -3,6 +3,7 @@ import '@typechain/hardhat'
 import { HardhatUserConfig } from 'hardhat/config'
 import 'hardhat-deploy'
 import '@nomiclabs/hardhat-etherscan'
+import ethers from 'ethers'
 
 import 'solidity-coverage'
 
@@ -16,9 +17,10 @@ let mnemonic = 'test '.repeat(11) + 'junk'
 if (fs.existsSync(mnemonicFileName)) { mnemonic = fs.readFileSync(mnemonicFileName, 'ascii') }
 
 // Set up dummy values to avoid github test runs from failing
-const DEPLOYER_PRIVATE_KEY = process.env.DEPLOYER_PRIVATE_KEY ?? ''
-const MUMBAI_DEPLOYER_PRIVATE_KEY = process.env.MUMBAI_DEPLOYER_PRIVATE_KEY ?? ''
-const MUMBAI_PAYMASTER_OWNER_PRIVATE_KEY = process.env.MUMBAI_PAYMASTER_OWNER_PRIVATE_KEY ?? ''
+const randomKey = ethers.Wallet.createRandom().privateKey
+const DEPLOYER_PRIVATE_KEY = process.env.DEPLOYER_PRIVATE_KEY ?? randomKey
+const MUMBAI_DEPLOYER_PRIVATE_KEY = process.env.MUMBAI_DEPLOYER_PRIVATE_KEY ?? randomKey
+const MUMBAI_PAYMASTER_OWNER_PRIVATE_KEY = process.env.MUMBAI_PAYMASTER_OWNER_PRIVATE_KEY ?? randomKey
 
 function getNetwork1(url: string): { url: string, accounts: { mnemonic: string } } {
   return {
