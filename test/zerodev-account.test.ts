@@ -4,8 +4,11 @@ import {
   ZeroDevAccount__factory,
   OwnerPlugin__factory,
   EntryPointRegistry__factory,
+  ZeroDevAccount,
+  OwnerPlugin,
 } from '../typechain'
 import { parseEther } from 'ethers/lib/utils'
+import { Wallet } from 'ethers'
 import { fillUserOpDefaults, signUserOp, getUserOpHash } from './UserOp'
 import { createAccountOwner } from './testutils'
 
@@ -64,50 +67,100 @@ describe('ZeroDevAccount', function () {
     expect(await account.plugins(plugin.address)).to.equal(false)
   })
 
-  it('should validate signature of owner', async () => {
-    // create the account and the plugin
-    const accountOwner = createAccountOwner()
-    const account = await new ZeroDevAccount__factory(ethers.provider.getSigner(entryPoint)).deploy(entryPointRegistry, accountOwner.address)
+  describe('validate signatures', () => {
+    let account: ZeroDevAccount
+    let accountOwner: Wallet
 
-    // create a userOp
-    const chainId = await ethers.provider.getNetwork().then(net => net.chainId)
+    let plugin: OwnerPlugin
+    let pluginOwner: Wallet
 
-    const userOp = signUserOp(fillUserOpDefaults({
-      sender: account.address,
-    }), accountOwner, entryPoint, chainId)
-    const userOpHash = await getUserOpHash(userOp, entryPoint, chainId)
+    let chainId: number
 
-    await account.validateUserOp(userOp, userOpHash, entryPoint, 0)
-  })
+    before(async () => {
+      // create the account and the plugin
+      accountOwner = createAccountOwner()
+      account = await new ZeroDevAccount__factory(ethers.provider.getSigner(entryPoint)).deploy(entryPointRegistry, accountOwner.address)
 
-  it('should validate signature of owner of the plugin', async () => {
-    // create the account and the plugin
-    const account = await new ZeroDevAccount__factory(ethers.provider.getSigner(entryPoint)).deploy(entryPointRegistry, ethersAccounts[0])
+      pluginOwner = createAccountOwner()
+      plugin = await new OwnerPlugin__factory(ethersSigner).deploy()
+      await plugin.transferOwnership(pluginOwner.address)
 
-    const pluginOwner = createAccountOwner()
-    const plugin = await new OwnerPlugin__factory(ethersSigner).deploy()
-    await plugin.transferOwnership(pluginOwner.address)
+      // register the plugin 
+      await account.registerPlugin(plugin.address)
 
-    // register the plugin 
-    await account.registerPlugin(plugin.address)
+      chainId = await ethers.provider.getNetwork().then(net => net.chainId)
+    })
 
-    // create a userOp
-    const chainId = await ethers.provider.getNetwork().then(net => net.chainId)
+    it('should validate signature of account owner', async () => {
+      const userOp = signUserOp(fillUserOpDefaults({
+        sender: account.address,
+      }), accountOwner, entryPoint, chainId)
+      const userOpHash = await getUserOpHash(userOp, entryPoint, chainId)
 
-    const userOp = signUserOp(fillUserOpDefaults({
-      sender: account.address,
-    }), pluginOwner, entryPoint, chainId)
-    const userOpHash = await getUserOpHash(userOp, entryPoint, chainId)
+      await account.validateUserOp(userOp, userOpHash, entryPoint, 0)
+    })
 
-    // assemble the correct signature by abi encoding the plugin selector, the plugin
-    // address, and the user op signature
-    const pluginSelector = await account.PLUGIN_SELECTOR()
-    const pluginSignature = ethers.utils.defaultAbiCoder.encode(
-      ['bytes4', 'address', 'bytes'],
-      [pluginSelector, plugin.address, userOp.signature]
-    )
-    userOp.signature = pluginSignature
+    it('should validate signature of the plugin', async () => {
+      const userOp = signUserOp(fillUserOpDefaults({
+        sender: account.address,
+        nonce: 1,
+      }), pluginOwner, entryPoint, chainId)
+      const userOpHash = await getUserOpHash(userOp, entryPoint, chainId)
 
-    await account.validateUserOp(userOp, userOpHash, entryPoint, 0)
+      // assemble the correct signature by abi encoding the plugin selector, the plugin
+      // address, and the user op signature
+      const pluginSelector = await account.PLUGIN_SELECTOR()
+      const pluginSignature = ethers.utils.defaultAbiCoder.encode(
+        ['bytes4', 'address', 'bytes'],
+        [pluginSelector, plugin.address, userOp.signature]
+      )
+      userOp.signature = pluginSignature
+
+      await account.validateUserOp(userOp, userOpHash, entryPoint, 0)
+    })
+
+    it('should not validate signature of unregistered plugin', async () => {
+      // get a random address
+      const unregisteredPluginAddr = Wallet.createRandom().address
+
+      const userOp = signUserOp(fillUserOpDefaults({
+        sender: account.address,
+        nonce: 2,
+      }), pluginOwner, entryPoint, chainId)
+      const userOpHash = await getUserOpHash(userOp, entryPoint, chainId)
+
+      // assemble signature
+      const pluginSelector = await account.PLUGIN_SELECTOR()
+      const pluginSignature = ethers.utils.defaultAbiCoder.encode(
+        ['bytes4', 'address', 'bytes'],
+        [pluginSelector, unregisteredPluginAddr, userOp.signature]
+      )
+      userOp.signature = pluginSignature
+
+      // validate should revert
+      await expect(account.validateUserOp(userOp, userOpHash, entryPoint, 0)).to.be.reverted
+    })
+
+    it("should not validate signature of plugin after it's deregistered", async () => {
+      // deregister the plugin
+      await account.deregisterPlugin(plugin.address)
+
+      const userOp = signUserOp(fillUserOpDefaults({
+        sender: account.address,
+        nonce: 2,
+      }), pluginOwner, entryPoint, chainId)
+      const userOpHash = await getUserOpHash(userOp, entryPoint, chainId)
+
+      // assumble signature
+      const pluginSelector = await account.PLUGIN_SELECTOR()
+      const pluginSignature = ethers.utils.defaultAbiCoder.encode(
+        ['bytes4', 'address', 'bytes'],
+        [pluginSelector, plugin.address, userOp.signature]
+      )
+      userOp.signature = pluginSignature
+
+      // validate should revert
+      await expect(account.validateUserOp(userOp, userOpHash, entryPoint, 0)).to.be.reverted
+    })
   })
 })
