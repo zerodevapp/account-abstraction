@@ -11,7 +11,9 @@ import {
   SafeProxy4337,
   SafeProxy4337__factory,
   TestCounter,
-  TestCounter__factory
+  TestCounter__factory,
+  UpgradableProxyFactory,
+  UpgradableProxyFactory__factory
 } from '../typechain'
 import {
   AddressZero,
@@ -39,6 +41,7 @@ describe('Gnosis Proxy', function () {
   let entryPoint: EntryPoint
   let counter: TestCounter
   let proxySafe: GnosisSafe
+  let upgradableProxyFactory: UpgradableProxyFactory
   let safe_execTxCallData: string
 
   before('before', async function () {
@@ -59,6 +62,8 @@ describe('Gnosis Proxy', function () {
     proxy = await new SafeProxy4337__factory(ethersSigner).deploy(safeSingleton.address, manager.address, ownerAddress)
 
     proxySafe = GnosisSafe__factory.connect(proxy.address, owner)
+
+    upgradableProxyFactory = await new UpgradableProxyFactory__factory(ethersSigner).deploy()
 
     await ethersSigner.sendTransaction({ to: proxy.address, value: parseEther('0.1') })
 
@@ -113,19 +118,30 @@ describe('Gnosis Proxy', function () {
 
   let counterfactualAddress: string
   it('should create account', async function () {
-    const ctrCode = hexValue(await new SafeProxy4337__factory(ethersSigner).getDeployTransaction(safeSingleton.address, manager.address, ownerAddress).data!)
+    // const ctrCode = hexValue(await new SafeProxy4337__factory(ethersSigner).getDeployTransaction(safeSingleton.address, manager.address, ownerAddress).data!)
+    // const initCode = hexConcat([
+    //   Create2Factory.contractAddress,
+    //   new Create2Factory(ethers.provider).getDeployTransactionCallData(ctrCode, 0)
+    // ])
+    console.log('BP1')
+    const deployCode = upgradableProxyFactory.interface.encodeFunctionData('deploy', [proxy.address, ethers.constants.HashZero])
+    console.log('BP2')
     const initCode = hexConcat([
-      Create2Factory.contractAddress,
-      new Create2Factory(ethers.provider).getDeployTransactionCallData(ctrCode, 0)
+      upgradableProxyFactory.address,
+      deployCode,
     ])
+    console.log('BP3')
 
     counterfactualAddress = await entryPoint.callStatic.getSenderAddress(initCode).catch(e => e.errorArgs.sender)
+    console.log('BP4')
     expect(!await isDeployed(counterfactualAddress))
+    console.log('BP5')
 
     await ethersSigner.sendTransaction({ to: counterfactualAddress, value: parseEther('0.1') })
+    console.log('BP6')
     const op = await fillAndSign({
       initCode,
-      verificationGasLimit: 400000
+      verificationGasLimit: 500000,
     }, owner, entryPoint)
 
     const rcpt = await entryPoint.handleOps([op], beneficiary).then(async r => r.wait())
@@ -133,7 +149,7 @@ describe('Gnosis Proxy', function () {
     expect(await isDeployed(counterfactualAddress))
 
     const newCode = await ethers.provider.getCode(counterfactualAddress)
-    expect(newCode.length).eq(324)
+    expect(newCode.length).eq(1362)
   })
 
   it('another op after creation', async function () {
@@ -199,5 +215,9 @@ describe('Gnosis Proxy', function () {
       expect(await proxySafe.isModuleEnabled(entryPoint.address)).to.equal(false)
       expect(await proxySafe.isModuleEnabled(oldFallback)).to.equal(false)
     })
+  })
+
+  it('can update implementation', async function () {
+    // safe_execTxCallData = safeSingleton.interface.encodeFunctionData('execTransactionFromModule', [counter.address, 0, counter_countCallData, 0])
   })
 })

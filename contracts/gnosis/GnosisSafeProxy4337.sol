@@ -4,6 +4,7 @@ pragma solidity ^0.8.7;
 /* solhint-disable avoid-low-level-calls */
 
 import "./EIP4337Manager.sol";
+import "../accounts/Upgradable.sol";
 import "@gnosis.pm/safe-contracts/contracts/proxies/GnosisSafeProxy.sol";
 
 /**
@@ -12,7 +13,7 @@ import "@gnosis.pm/safe-contracts/contracts/proxies/GnosisSafeProxy.sol";
  * It is possible to add more owners, but currently, it can only be accessed via Account-Abstraction
  * if the owners threshold is exactly 1.
  */
-contract SafeProxy4337 is GnosisSafeProxy {
+contract SafeProxy4337 is GnosisSafeProxy, Upgradable {
     constructor(
         address singleton, EIP4337Manager aaModule,
         address owner
