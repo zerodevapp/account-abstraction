@@ -19,6 +19,7 @@ import "../interfaces/ICreate2Deployer.sol";
 import "../utils/Exec.sol";
 import "./StakeManager.sol";
 import "./SenderCreator.sol";
+import "hardhat/console.sol";
 
 contract EntryPoint is IEntryPoint, StakeManager {
 
@@ -284,9 +285,11 @@ contract EntryPoint is IEntryPoint, StakeManager {
     function _validateAccountPrepayment(uint256 opIndex, UserOperation calldata op, UserOpInfo memory opInfo, address aggregator, uint256 requiredPrefund)
     internal returns (uint256 gasUsedByValidateAccountPrepayment, address actualAggregator, uint256 deadline) {
     unchecked {
+        console.log('BP1.2.2.1');
         uint256 preGas = gasleft();
         MemoryUserOp memory mUserOp = opInfo.mUserOp;
         _createSenderIfNeeded(opIndex, mUserOp, op.initCode);
+        console.log('BP1.2.2.2');
         if (aggregator == SIMULATE_FIND_AGGREGATOR) {
             try IAggregatedAccount(mUserOp.sender).getAggregator() returns (address userOpAggregator) {
                 aggregator = actualAggregator = userOpAggregator;
@@ -294,24 +297,31 @@ contract EntryPoint is IEntryPoint, StakeManager {
                 aggregator = actualAggregator = address(0);
             }
         }
+        console.log('BP1.2.2.3');
         uint256 missingAccountFunds = 0;
         address sender = mUserOp.sender;
         address paymaster = mUserOp.paymaster;
+        console.log('BP1.2.2.4');
         if (paymaster == address(0)) {
             uint256 bal = balanceOf(sender);
             missingAccountFunds = bal > requiredPrefund ? 0 : requiredPrefund - bal;
         }
+        console.log('BP1.2.2.5');
         try IAccount(sender).validateUserOp{gas : mUserOp.verificationGasLimit}(op, opInfo.userOpHash, aggregator, missingAccountFunds) returns (uint256 _deadline) {
+            console.log('BP1.2.2.5.1');
             // solhint-disable-next-line not-rely-on-time
             if (_deadline != 0 && _deadline < block.timestamp) {
                 revert FailedOp(opIndex, address(0), "expired");
             }
             deadline = _deadline;
         } catch Error(string memory revertReason) {
+            console.log('BP1.2.2.5.2');
             revert FailedOp(opIndex, address(0), revertReason);
         } catch {
+            console.log('BP1.2.2.5.3');
             revert FailedOp(opIndex, address(0), "");
         }
+        console.log('BP1.2.2.6');
         if (paymaster == address(0)) {
             DepositInfo storage senderInfo = deposits[sender];
             uint256 deposit = senderInfo.deposit;
@@ -320,6 +330,7 @@ contract EntryPoint is IEntryPoint, StakeManager {
             }
             senderInfo.deposit = uint112(deposit - requiredPrefund);
         }
+        console.log('BP1.2.2.7');
         gasUsedByValidateAccountPrepayment = preGas - gasleft();
     }
     }
@@ -371,24 +382,31 @@ contract EntryPoint is IEntryPoint, StakeManager {
     function _validatePrepayment(uint256 opIndex, UserOperation calldata userOp, UserOpInfo memory outOpInfo, address aggregator)
     private returns (address actualAggregator, uint256 deadline) {
 
+        console.log("BP1");
         uint256 preGas = gasleft();
         MemoryUserOp memory mUserOp = outOpInfo.mUserOp;
         _copyUserOpToMemory(userOp, mUserOp);
         outOpInfo.userOpHash = getUserOpHash(userOp);
+        console.log("BP1.1");
 
         // validate all numeric values in userOp are well below 128 bit, so they can safely be added
         // and multiplied without causing overflow
         uint256 maxGasValues = mUserOp.preVerificationGas | mUserOp.verificationGasLimit | mUserOp.callGasLimit |
         userOp.maxFeePerGas | userOp.maxPriorityFeePerGas;
         require(maxGasValues <= type(uint120).max, "gas values overflow");
+        console.log("BP1.2");
 
         uint256 gasUsedByValidateAccountPrepayment;
+        console.log("BP1.2.1");
         (uint256 requiredPreFund) = _getRequiredPrefund(mUserOp);
+        console.log("BP1.2.2");
         (gasUsedByValidateAccountPrepayment, actualAggregator, deadline) = _validateAccountPrepayment(opIndex, userOp, outOpInfo, aggregator, requiredPreFund);
+        console.log("BP1.2.3");
         //a "marker" where account opcode validation is done and paymaster opcode validation is about to start
         // (used only by off-chain simulateValidation)
         numberMarker();
 
+        console.log("BP2");
         bytes memory context;
         if (mUserOp.paymaster != address(0)) {
             uint paymasterDeadline;
@@ -400,6 +418,7 @@ contract EntryPoint is IEntryPoint, StakeManager {
             context = "";
 
         }
+        console.log("BP3");
     unchecked {
         uint256 gasUsed = preGas - gasleft();
 
@@ -409,6 +428,7 @@ contract EntryPoint is IEntryPoint, StakeManager {
         outOpInfo.prefund = requiredPreFund;
         outOpInfo.contextOffset = getOffsetOfMemoryBytes(context);
         outOpInfo.preOpGas = preGas - gasleft() + userOp.preVerificationGas;
+        console.log("BP4");
     }
     }
 

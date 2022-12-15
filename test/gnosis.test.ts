@@ -123,27 +123,23 @@ describe('Gnosis Proxy', function () {
     //   Create2Factory.contractAddress,
     //   new Create2Factory(ethers.provider).getDeployTransactionCallData(ctrCode, 0)
     // ])
-    console.log('BP1')
     const deployCode = upgradableProxyFactory.interface.encodeFunctionData('deploy', [proxy.address, ethers.constants.HashZero])
-    console.log('BP2')
     const initCode = hexConcat([
       upgradableProxyFactory.address,
       deployCode,
     ])
-    console.log('BP3')
 
     counterfactualAddress = await entryPoint.callStatic.getSenderAddress(initCode).catch(e => e.errorArgs.sender)
-    console.log('BP4')
     expect(!await isDeployed(counterfactualAddress))
-    console.log('BP5')
+    console.log('counterfactualAddress=', counterfactualAddress)
 
     await ethersSigner.sendTransaction({ to: counterfactualAddress, value: parseEther('0.1') })
-    console.log('BP6')
     const op = await fillAndSign({
       initCode,
       verificationGasLimit: 500000,
     }, owner, entryPoint)
 
+    console.log('before handle ops')
     const rcpt = await entryPoint.handleOps([op], beneficiary).then(async r => r.wait())
     console.log('gasUsed=', rcpt.gasUsed, rcpt.transactionHash)
     expect(await isDeployed(counterfactualAddress))
