@@ -5,7 +5,7 @@ import {
   OwnerPlugin__factory,
   EntryPointRegistry__factory,
   ZeroDevAccount,
-  OwnerPlugin,
+  OwnerPlugin
 } from '../typechain'
 import { parseEther } from 'ethers/lib/utils'
 import { Wallet } from 'ethers'
@@ -27,7 +27,7 @@ describe('ZeroDevAccount', function () {
 
     // set entrypoint
     entryPoint = ethersAccounts[2]
-    registry.setEntryPoint(entryPoint)
+    await registry.setEntryPoint(entryPoint)
     entryPointRegistry = registry.address
   })
 
@@ -47,11 +47,6 @@ describe('ZeroDevAccount', function () {
       .to.be.revertedWith('only owner')
   })
 
-  it('should not be able to update entrypoint using another signer', async () => {
-    const account = await new ZeroDevAccount__factory(ethers.provider.getSigner()).deploy(entryPointRegistry, ethersAccounts[0])
-    await expect(account.updateEntryPoint(ethersAccounts[1])).to.be.reverted
-  })
-
   it('should be able to register and deregister an owner plugin', async () => {
     const account = await new ZeroDevAccount__factory(ethers.provider.getSigner()).deploy(entryPointRegistry, ethersAccounts[0])
     const plugin = await new OwnerPlugin__factory(ethers.provider.getSigner()).deploy()
@@ -60,7 +55,7 @@ describe('ZeroDevAccount', function () {
     // Check that the plugin is registered by checking the `plugins` mapping
     expect(await account.plugins(plugin.address)).to.equal(true)
 
-    // now test the deregister 
+    // now test the deregister
     await account.deregisterPlugin(plugin.address)
 
     // and check that the plugin is no longer registered
@@ -85,7 +80,7 @@ describe('ZeroDevAccount', function () {
       plugin = await new OwnerPlugin__factory(ethersSigner).deploy()
       await plugin.transferOwnership(pluginOwner.address)
 
-      // register the plugin 
+      // register the plugin
       await account.registerPlugin(plugin.address)
 
       chainId = await ethers.provider.getNetwork().then(net => net.chainId)
@@ -93,9 +88,9 @@ describe('ZeroDevAccount', function () {
 
     it('should validate signature of account owner', async () => {
       const userOp = signUserOp(fillUserOpDefaults({
-        sender: account.address,
+        sender: account.address
       }), accountOwner, entryPoint, chainId)
-      const userOpHash = await getUserOpHash(userOp, entryPoint, chainId)
+      const userOpHash = getUserOpHash(userOp, entryPoint, chainId)
 
       await account.validateUserOp(userOp, userOpHash, entryPoint, 0)
     })
@@ -103,9 +98,9 @@ describe('ZeroDevAccount', function () {
     it('should validate signature of the plugin', async () => {
       const userOp = signUserOp(fillUserOpDefaults({
         sender: account.address,
-        nonce: 1,
+        nonce: 1
       }), pluginOwner, entryPoint, chainId)
-      const userOpHash = await getUserOpHash(userOp, entryPoint, chainId)
+      const userOpHash = getUserOpHash(userOp, entryPoint, chainId)
 
       // assemble the correct signature by abi encoding the plugin selector, the plugin
       // address, and the user op signature
@@ -125,9 +120,9 @@ describe('ZeroDevAccount', function () {
 
       const userOp = signUserOp(fillUserOpDefaults({
         sender: account.address,
-        nonce: 2,
+        nonce: 2
       }), pluginOwner, entryPoint, chainId)
-      const userOpHash = await getUserOpHash(userOp, entryPoint, chainId)
+      const userOpHash = getUserOpHash(userOp, entryPoint, chainId)
 
       // assemble signature
       const pluginSelector = await account.PLUGIN_SELECTOR()
@@ -147,9 +142,9 @@ describe('ZeroDevAccount', function () {
 
       const userOp = signUserOp(fillUserOpDefaults({
         sender: account.address,
-        nonce: 2,
+        nonce: 2
       }), pluginOwner, entryPoint, chainId)
-      const userOpHash = await getUserOpHash(userOp, entryPoint, chainId)
+      const userOpHash = getUserOpHash(userOp, entryPoint, chainId)
 
       // assumble signature
       const pluginSelector = await account.PLUGIN_SELECTOR()

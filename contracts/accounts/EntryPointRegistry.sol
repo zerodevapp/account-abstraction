@@ -12,9 +12,10 @@ contract EntryPointRegistry is IEntryPointRegistry, Ownable {
 
     function getEntryPoint() external view override returns (IEntryPoint) {
         return entryPoint;
-    } 
+    }
 
     function setEntryPoint(IEntryPoint _entryPoint) external onlyOwner {
         entryPoint = _entryPoint;
     }
 }
+

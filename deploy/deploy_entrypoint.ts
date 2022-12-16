@@ -22,7 +22,7 @@ const deployEntryPoint: DeployFunction = async function (hre: HardhatRuntimeEnvi
   console.log('==EntryPoint addr=', entryPoint.address)
 
   const simpleWalletDeployer = await hre.deployments.deploy(
-    'SimpleWalletDeployer',
+    'SimpleAccount',
     {
       from,
       deterministicDeployment: true
@@ -36,7 +36,7 @@ const deployEntryPoint: DeployFunction = async function (hre: HardhatRuntimeEnvi
     'VerifyingPaymaster',
     {
       from: paymasterOwner,
-      args: [entryPoint.address, paymasterOwner],
+      args: [entryPoint.address, paymasterOwner]
     })
   console.log('==VerifyingPaymaster addr=', verifyingPaymaster.address)
   console.log('==VerifyingPaymaster owner=', paymasterOwner)
@@ -45,16 +45,16 @@ const deployEntryPoint: DeployFunction = async function (hre: HardhatRuntimeEnvi
 
   // stake and deposit for the paymaster
   let tx = await vpContract.addStake(1, {
-    value: PAYMASTER_STAKE,
+    value: PAYMASTER_STAKE
   })
   await tx.wait()
-  console.log("Paymaster staked")
+  console.log('Paymaster staked')
 
   tx = await vpContract.deposit({
-    value: PAYMASTER_DEPOSIT,
+    value: PAYMASTER_DEPOSIT
   })
   await tx.wait()
-  console.log("Paymaster deposited")
+  console.log('Paymaster deposited')
 }
 
 export default deployEntryPoint
