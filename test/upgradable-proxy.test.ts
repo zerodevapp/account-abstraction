@@ -10,9 +10,11 @@ import {
   TestUpgradableCounterV2__factory,
 } from '../typechain'
 import { HashZero } from './testutils'
+import { hexlify } from 'ethers/lib/utils'
 
 describe('Upgradable Proxy', () => {
   let ethersSigner: Signer
+  let counter: TestUpgradableCounter
   let upgradableProxyFactory: UpgradableProxyFactory
   let proxyCounter: TestUpgradableCounter
 
@@ -22,7 +24,7 @@ describe('Upgradable Proxy', () => {
   })
 
   it('should deploy a proxy', async function () {
-    const counter = await new TestUpgradableCounter__factory(ethersSigner).deploy()
+    counter = await new TestUpgradableCounter__factory(ethersSigner).deploy()
 
     // predict the address
     const proxyAddr = await upgradableProxyFactory.callStatic.deploy(counter.address, HashZero)
@@ -35,6 +37,22 @@ describe('Upgradable Proxy', () => {
 
     await proxyCounter.increment()
     expect(await proxyCounter.counter()).to.equal(1)
+  })
+
+  it('another proxy should have separate storage', async () => {
+    // use ethers to get a random bytes32 salt
+    const salt = ethers.utils.randomBytes(32)
+
+    const anotherProxyAddr = await upgradableProxyFactory.callStatic.deploy(counter.address, salt)
+    await upgradableProxyFactory.deploy(counter.address, salt)
+    const anotherProxyCounter = await new TestUpgradableCounter__factory(ethersSigner).attach(anotherProxyAddr)
+
+    // this proxy counter should have its own storage, so counter should be 0
+    expect(await anotherProxyCounter.counter()).to.equal(0)
+
+    // should be able to increment
+    await anotherProxyCounter.increment()
+    expect(await anotherProxyCounter.counter()).to.equal(1)
   })
 
   it('should upgrade implementation', async () => {

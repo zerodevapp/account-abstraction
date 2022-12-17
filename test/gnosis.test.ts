@@ -13,7 +13,8 @@ import {
   TestCounter,
   TestCounter__factory,
   UpgradableProxyFactory,
-  UpgradableProxyFactory__factory
+  UpgradableProxyFactory__factory,
+  TestUpgradableCounter__factory,
 } from '../typechain'
 import {
   AddressZero,
@@ -61,7 +62,18 @@ describe('Gnosis Proxy', function () {
 
     proxy = await new SafeProxy4337__factory(ethersSigner).deploy(safeSingleton.address, manager.address, ownerAddress)
 
+    // find the amount of gas needed to deploy SafeProxy4337
+    const deployData = new SafeProxy4337__factory(ethersSigner).interface.encodeDeploy([safeSingleton.address, manager.address, ownerAddress])
+    const estimatedGas = await ethers.provider.estimateGas({ data: deployData })
+    console.log('deploy gas:', estimatedGas)
+
     proxySafe = GnosisSafe__factory.connect(proxy.address, owner)
+    await ethersSigner.sendTransaction({ to: ownerAddress, value: parseEther('0.1') })
+
+    const sentinelAddress = '0x0000000000000000000000000000000000000001'
+    const tx = await proxySafe.swapOwner(sentinelAddress, ownerAddress, createAddress())
+    const receipt = await tx.wait()
+    console.log('swapOwner gas:', receipt.gasUsed)
 
     upgradableProxyFactory = await new UpgradableProxyFactory__factory(ethersSigner).deploy()
 
@@ -116,6 +128,37 @@ describe('Gnosis Proxy', function () {
     expect(await getBalance(beneficiary)).to.eq(ev.args!.actualGasCost)
   })
 
+  it('SafeProxy4337 should be upgradable', async () => {
+    const counter = await new TestUpgradableCounter__factory(ethersSigner).deploy()
+
+    const safe = GnosisSafe__factory.connect(proxy.address, owner)
+    const zeroAddress = '0x0000000000000000000000000000000000000000'
+
+    const callData = proxy.interface.encodeFunctionData('updateImplementation', [counter.address])
+    await safe.execTransaction(safe.address, 0, callData, 0, 0, 0, 0, zeroAddress, zeroAddress, HashZero)
+
+    const proxyCounter = TestUpgradableCounter__factory.connect(proxy.address, owner)
+    console.log(await proxyCounter.counter())
+  })
+
+  it('should deploy gnosis account through proxy factory', async () => {
+    // this works... so somehow stacking delegates doesn't work
+    // const upgradableProxyAddr = await upgradableProxyFactory.callStatic.deploy(safeSingleton.address, HashZero)
+    // expect(await ethers.provider.getCode(upgradableProxyAddr)).to.equal('0x')
+    // await upgradableProxyFactory.deploy(safeSingleton.address, ethers.constants.HashZero)
+    // expect(await ethers.provider.getCode(upgradableProxyAddr)).to.not.equal('0x')
+
+    const upgradableProxyAddr = await upgradableProxyFactory.callStatic.deploy(proxy.address, HashZero)
+    expect(await ethers.provider.getCode(upgradableProxyAddr)).to.equal('0x')
+    await upgradableProxyFactory.deploy(proxy.address, ethers.constants.HashZero)
+    expect(await ethers.provider.getCode(upgradableProxyAddr)).to.not.equal('0x')
+
+    const upgradableProxySafe = await new GnosisSafe__factory(owner).attach(upgradableProxyAddr)
+    const proxySafe = await new GnosisSafe__factory(owner).attach(proxy.address)
+    console.log('proxy safe', await proxySafe.VERSION())
+    console.log('upgradable proxy safe', await upgradableProxySafe.VERSION())
+  })
+
   let counterfactualAddress: string
   it('should create account', async function () {
     // const ctrCode = hexValue(await new SafeProxy4337__factory(ethersSigner).getDeployTransaction(safeSingleton.address, manager.address, ownerAddress).data!)
@@ -136,7 +179,7 @@ describe('Gnosis Proxy', function () {
     await ethersSigner.sendTransaction({ to: counterfactualAddress, value: parseEther('0.1') })
     const op = await fillAndSign({
       initCode,
-      verificationGasLimit: 500000,
+      verificationGasLimit: 2500000,
     }, owner, entryPoint)
 
     console.log('before handle ops')
