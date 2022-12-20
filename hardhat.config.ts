@@ -22,14 +22,14 @@ const DEPLOYER_PRIVATE_KEY = process.env.DEPLOYER_PRIVATE_KEY ?? randomKey
 const MUMBAI_DEPLOYER_PRIVATE_KEY = process.env.MUMBAI_DEPLOYER_PRIVATE_KEY ?? randomKey
 const MUMBAI_PAYMASTER_OWNER_PRIVATE_KEY = process.env.MUMBAI_PAYMASTER_OWNER_PRIVATE_KEY ?? randomKey
 
-function getNetwork1(url: string): { url: string, accounts: { mnemonic: string } } {
+function getNetwork1 (url: string): { url: string, accounts: { mnemonic: string } } {
   return {
     url,
     accounts: { mnemonic }
   }
 }
 
-function getNetwork(name: string): { url: string, accounts: { mnemonic: string } } {
+function getNetwork (name: string): { url: string, accounts: { mnemonic: string } } {
   return getNetwork1(`https://${name}.infura.io/v3/${process.env.INFURA_ID}`)
   // return getNetwork1(`wss://${name}.infura.io/ws/v3/${process.env.INFURA_ID}`)
 }
@@ -66,21 +66,21 @@ const config: HardhatUserConfig = {
     kovan: getNetwork('kovan'),
     mumbai: {
       url: `https://polygon-mumbai.infura.io/v3/${process.env.INFURA_ID}`,
-      accounts: [MUMBAI_DEPLOYER_PRIVATE_KEY],
+      accounts: [MUMBAI_DEPLOYER_PRIVATE_KEY]
     },
     polygon: {
       url: `https://polygon-mainnet.infura.io/v3/${process.env.INFURA_ID}`,
-      accounts: [DEPLOYER_PRIVATE_KEY],
+      accounts: [DEPLOYER_PRIVATE_KEY]
     },
     goerli: {
       url: `https://goerli.infura.io/v3/${process.env.INFURA_ID}`,
-      accounts: [DEPLOYER_PRIVATE_KEY, MUMBAI_PAYMASTER_OWNER_PRIVATE_KEY],
-    },
+      accounts: [DEPLOYER_PRIVATE_KEY, MUMBAI_PAYMASTER_OWNER_PRIVATE_KEY]
+    }
   },
   namedAccounts: {
     paymasterOwner: {
-      default: 1,
-      // default: `privatekey://${process.env.MUMBAI_PAYMASTER_OWNER_PRIVATE_KEY!}`,
+      // default: 1
+      default: `privatekey://${process.env.MUMBAI_PAYMASTER_OWNER_PRIVATE_KEY!}`
     }
   },
   mocha: {

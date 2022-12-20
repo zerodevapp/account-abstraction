@@ -5,7 +5,8 @@
   "scripts": {
     "clean": "rm -rf cache artifacts typechain typechain-types",
     "compile": "./scripts/hh-wrapper compile",
-    "tsc": "tsc",
+    "tsc": "rm -rf dist && tsc",
+    "build:local": "yarn tsc && yarn pack",
     "lint": "yarn compile && yarn run lint:sol && yarn run lint:js ",
     "lint:js": "eslint -f unix .",
     "lint-fix": "eslint -f unix . --fix",
