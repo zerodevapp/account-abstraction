@@ -15,7 +15,6 @@ const deployEntryPoint: DeployFunction = async function (hre: HardhatRuntimeEnvi
     'EntryPoint',
     {
       from,
-      args: [],
       gasLimit: 6e6,
       deterministicDeployment: true
     })
@@ -25,6 +24,7 @@ const deployEntryPoint: DeployFunction = async function (hre: HardhatRuntimeEnvi
     'SimpleAccount',
     {
       from,
+      args: [entryPoint.address],
       deterministicDeployment: true
     })
   console.log('==SimpleWalletDeployer addr=', simpleWalletDeployer.address)
