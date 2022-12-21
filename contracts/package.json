@@ -1,7 +1,7 @@
 {
-  "name": "@account-abstraction/contracts",
+  "name": "@zerodevapp/contracts",
   "description": "Account Abstraction (EIP 4337) contracts",
-  "version": "0.2.0",
+  "version": "1.0.2",
   "main": "./dist/index.js",
   "scripts": {
     "prepack": "../scripts/prepack-contracts-package.sh",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/eth-infinitism/account-abstraction"
+    "url": "https://github.com/zerodevapp/account-abstraction"
   },
   "keywords": [
     "solidity",
@@ -21,6 +21,6 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/eth-infinitism/account-abstraction/issues"
+    "url": "https://github.com/zerodevapp/account-abstraction/issues"
   }
 }
