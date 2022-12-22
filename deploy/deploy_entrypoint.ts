@@ -20,14 +20,14 @@ const deployEntryPoint: DeployFunction = async function (hre: HardhatRuntimeEnvi
     })
   console.log('==EntryPoint addr=', entryPoint.address)
 
-  const simpleWalletDeployer = await hre.deployments.deploy(
+  const simpleAccountDeployer = await hre.deployments.deploy(
     'SimpleAccount',
     {
       from,
       args: [entryPoint.address, from],
       deterministicDeployment: true
     })
-  console.log('==SimpleWalletDeployer addr=', simpleWalletDeployer.address)
+  console.log('==SimpleAccountDeployer addr=', simpleAccountDeployer.address)
 
   const { paymasterOwner } = (await hre.getNamedAccounts())
   const paymasterOwnerSigner = await ethers.getSigner(paymasterOwner)
