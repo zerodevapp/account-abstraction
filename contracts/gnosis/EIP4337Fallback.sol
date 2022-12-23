@@ -15,10 +15,10 @@ contract EIP4337Fallback is DefaultCallbackHandler, IAccount {
     }
 
     /**
-     * handler is called from the Safe. delegate actual work to EIP4337Manager
+     * delegate the contract call to the EIP4337Manager
      */
-    function validateUserOp(UserOperation calldata, bytes32, address, uint256) override external returns (uint256 deadline){
-        //delegate entire msg.data (including the appended "msg.sender") to the EIP4337Manager
+    function delegateToManager() internal {
+        // delegate entire msg.data (including the appended "msg.sender") to the EIP4337Manager
         // will work only for GnosisSafe contracts
         GnosisSafe safe = GnosisSafe(payable(msg.sender));
         (bool success, bytes memory ret) = safe.execTransactionFromModuleReturnData(eip4337manager, 0, msg.data, Enum.Operation.DelegateCall);
@@ -27,7 +27,25 @@ contract EIP4337Fallback is DefaultCallbackHandler, IAccount {
                 revert(add(ret, 32), mload(ret))
             }
         }
+    }
+
+    /**
+     * called from the Safe. delegate actual work to EIP4337Manager
+     */
+    function validateUserOp(UserOperation calldata, bytes32, address, uint256) override external returns (uint256 deadline){
+        delegateToManager();
         return 0;
     }
 
+    /**
+     * called from the Safe. delegate actual work to EIP4337Manager
+     */
+    function executeAndRevert(
+        address to,
+        uint256 value,
+        bytes memory data,
+        Enum.Operation operation
+    ) external {
+        delegateToManager();
+    }
 }
