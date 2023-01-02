@@ -65,6 +65,10 @@ const config: HardhatUserConfig = {
       url: `https://polygon-mainnet.infura.io/v3/${process.env.INFURA_ID}`,
       accounts: [process.env.DEPLOYER_PRIVATE_KEY!],
     },
+    mainnet: {
+      url: `https://mainnet.infura.io/v3/${process.env.INFURA_ID}`,
+      accounts: [process.env.DEPLOYER_PRIVATE_KEY!, process.env.MUMBAI_PAYMASTER_OWNER_PRIVATE_KEY!],
+    },
     goerli: {
       url: `https://goerli.infura.io/v3/${process.env.INFURA_ID}`,
       accounts: [process.env.DEPLOYER_PRIVATE_KEY!, process.env.MUMBAI_PAYMASTER_OWNER_PRIVATE_KEY!],
