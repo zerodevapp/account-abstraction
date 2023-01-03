@@ -1,2 +1,2 @@
-export { UserOperationStruct } from './types/EntryPoint'
+export type { UserOperationStruct } from './types/EntryPoint'
 export * from './types'
