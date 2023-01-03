@@ -8,7 +8,8 @@ pragma solidity ^0.8.7;
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@gnosis.pm/safe-contracts/contracts/GnosisSafe.sol";
 import "./EIP4337Fallback.sol";
-import "../core/EntryPoint.sol";
+import "../interfaces/IAccount.sol";
+import "../interfaces/IEntryPoint.sol";
 
     using ECDSA for bytes32;
 
@@ -33,7 +34,7 @@ contract EIP4337Manager is GnosisSafe, IAccount {
      * delegate-called (using execFromModule) through the fallback, so "real" msg.sender is attached as last 20 bytes
      */
     function validateUserOp(UserOperation calldata userOp, bytes32 userOpHash, address /*aggregator*/, uint256 missingAccountFunds)
-    external override returns (uint256 deadline) {
+    external override returns (uint256 sigTimeRange) {
         address _msgSender = address(bytes20(msg.data[msg.data.length - 20 :]));
         require(_msgSender == entryPoint, "account: not from entrypoint");
 
@@ -58,32 +59,16 @@ contract EIP4337Manager is GnosisSafe, IAccount {
 
     /**
      * set up a safe as EIP-4337 enabled.
-     * called from the GnosisSafeProxy4337 during construction time
+     * called from the GnosisSafeAccountFactory during construction time
      * - enable 3 modules (this module, fallback and the entrypoint)
      * - this method is called with delegateCall, so the module (usually itself) is passed as parameter, and "this" is the safe itself
      */
-    function setupEIP4337(
-        address singleton,
-        EIP4337Manager manager,
-        address owner
+    function setup4337Modules(
+        EIP4337Manager manager //the manager (this contract)
     ) external {
-        address eip4337fallback = manager.eip4337Fallback();
-
-        address[] memory owners = new address[](1);
-        owners[0] = owner;
-        uint threshold = 1;
-
-        execute(singleton, 0, abi.encodeCall(GnosisSafe.setup, (
-            owners, threshold,
-            address(0), "", //no delegate call
-            eip4337fallback,
-            address(0), 0, payable(0) //no payment receiver
-            )),
-            Enum.Operation.DelegateCall, gasleft()
-        );
-
-        _enableModule(manager.entryPoint());
-        _enableModule(eip4337fallback);
+        GnosisSafe safe = GnosisSafe(payable(this));
+        safe.enableModule(manager.entryPoint());
+        safe.enableModule(manager.eip4337Fallback());
     }
 
     /**
@@ -143,24 +128,6 @@ contract EIP4337Manager is GnosisSafe, IAccount {
             success := delegatecall(sub(0, 1), to, add(data, 0x20), mload(data), 0, 0)
         }
         require(success, "delegate failed");
-    }
-
-    /// copied from GnosisSafe ModuleManager, FallbackManager
-    /// enableModule is "external authorizeOnly", can't be used during construction using a "delegatecall"
-
-    /// @dev Allows to add a module to the whitelist.
-    ///      this is a variant of enableModule that is used only during construction
-    /// @notice Enables the module `module` for the Safe.
-    /// @param module Module to be whitelisted.
-    function _enableModule(address module) private {
-
-        // Module address cannot be null or sentinel.
-        require(module != address(0) && module != SENTINEL_MODULES, "GS101");
-        // Module cannot be added twice.
-        require(modules[module] == address(0), "GS102");
-        modules[module] = modules[SENTINEL_MODULES];
-        modules[SENTINEL_MODULES] = module;
-        emit EnabledModule(module);
     }
 
     /**

@@ -6,6 +6,8 @@ import {
   BLSSignatureAggregator__factory,
   BLSAccount,
   BLSAccount__factory,
+  BLSAccountFactory,
+  BLSAccountFactory__factory,
   EntryPoint
 } from '../typechain'
 import { ethers } from 'hardhat'
@@ -16,8 +18,6 @@ import { keccak256 } from 'ethereumjs-util'
 import { hashToPoint } from '@thehubbleproject/bls/dist/mcl'
 import { BigNumber } from 'ethers'
 import { BytesLike, hexValue } from '@ethersproject/bytes'
-import { BLSAccountDeployer } from '../typechain/contracts/bls/BLSAccount.sol'
-import { BLSAccountDeployer__factory } from '../typechain/factories/contracts/bls/BLSAccount.sol'
 
 describe('bls account', function () {
   this.timeout(20000)
@@ -30,7 +30,7 @@ describe('bls account', function () {
   let entrypoint: EntryPoint
   let account1: BLSAccount
   let account2: BLSAccount
-  let accountDeployer: BLSAccountDeployer
+  let accountDeployer: BLSAccountFactory
   before(async () => {
     entrypoint = await deployEntryPoint()
     const BLSOpenLib = await new BLSOpen__factory(ethers.provider.getSigner()).deploy()
@@ -43,10 +43,13 @@ describe('bls account', function () {
     signer1 = fact.getSigner(arrayify(BLS_DOMAIN), '0x01')
     signer2 = fact.getSigner(arrayify(BLS_DOMAIN), '0x02')
 
-    accountDeployer = await new BLSAccountDeployer__factory(etherSigner).deploy()
+    accountDeployer = await new BLSAccountFactory__factory(etherSigner).deploy(entrypoint.address, blsAgg.address)
 
-    account1 = await new BLSAccount__factory(etherSigner).deploy(entrypoint.address, blsAgg.address, signer1.pubkey)
-    account2 = await new BLSAccount__factory(etherSigner).deploy(entrypoint.address, blsAgg.address, signer2.pubkey)
+    // TODO: these two are not created via the 'accountDeployer' for some reason - I am not touching it for now
+    account1 = await new BLSAccount__factory(etherSigner).deploy(entrypoint.address, blsAgg.address)
+    await account1['initialize(uint256[4])'](signer1.pubkey)
+    account2 = await new BLSAccount__factory(etherSigner).deploy(entrypoint.address, blsAgg.address)
+    await account2['initialize(uint256[4])'](signer2.pubkey)
   })
 
   it('#getTrailingPublicKey', async () => {
@@ -133,11 +136,11 @@ describe('bls account', function () {
       signer3 = fact.getSigner(arrayify(BLS_DOMAIN), '0x03')
       initCode = hexConcat([
         accountDeployer.address,
-        accountDeployer.interface.encodeFunctionData('deployAccount', [entrypoint.address, blsAgg.address, 0, signer3.pubkey])
+        accountDeployer.interface.encodeFunctionData('createAccount', [0, signer3.pubkey])
       ])
     })
 
-    it('validate after simulation returns SimulationResultWithAggregation', async () => {
+    it('validate after simulation returns ValidationResultWithAggregation', async () => {
       const verifier = new BlsVerifier(BLS_DOMAIN)
       const senderAddress = await entrypoint.callStatic.getSenderAddress(initCode).catch(e => e.errorArgs.sender)
       await fund(senderAddress, '0.01')
@@ -150,10 +153,10 @@ describe('bls account', function () {
       const sigParts = signer3.sign(requestHash)
       userOp.signature = hexConcat(sigParts)
 
-      const { aggregationInfo } = await entrypoint.callStatic.simulateValidation(userOp).catch(simulationResultWithAggregationCatch)
-      expect(aggregationInfo.actualAggregator).to.eq(blsAgg.address)
-      expect(aggregationInfo.aggregatorStake).to.eq(ONE_ETH)
-      expect(aggregationInfo.aggregatorUnstakeDelay).to.eq(2)
+      const { aggregatorInfo } = await entrypoint.callStatic.simulateValidation(userOp).catch(simulationResultWithAggregationCatch)
+      expect(aggregatorInfo.actualAggregator).to.eq(blsAgg.address)
+      expect(aggregatorInfo.stakeInfo.stake).to.eq(ONE_ETH)
+      expect(aggregatorInfo.stakeInfo.unstakeDelaySec).to.eq(2)
 
       const [signature] = defaultAbiCoder.decode(['bytes32[2]'], userOp.signature)
       const pubkey = (await blsAgg.getUserOpPublicKey(userOp)).map(n => hexValue(n)) // TODO: returns uint256[4], verify needs bytes32[4]

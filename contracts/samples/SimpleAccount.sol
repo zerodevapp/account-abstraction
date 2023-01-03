@@ -5,8 +5,11 @@ pragma solidity ^0.8.12;
 /* solhint-disable no-inline-assembly */
 /* solhint-disable reason-string */
 
-import "../core/BaseAccount.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts/proxy/utils/UUPSUpgradeable.sol";
+
+import "../core/BaseAccount.sol";
 
 /**
   * minimal account.
@@ -14,7 +17,7 @@ import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
   *  has execute, eth handling methods
   *  has a single signer that can send requests through the entryPoint.
   */
-contract SimpleAccount is BaseAccount {
+contract SimpleAccount is BaseAccount, UUPSUpgradeable, Initializable {
     using ECDSA for bytes32;
 
     //explicit sizes of nonce, to fit a single storage cell with "owner"
@@ -29,16 +32,15 @@ contract SimpleAccount is BaseAccount {
         return _entryPoint;
     }
 
-    IEntryPoint private _entryPoint;
+    IEntryPoint private immutable _entryPoint;
 
-    event EntryPointChanged(address indexed oldEntryPoint, address indexed newEntryPoint);
+    event SimpleAccountInitialized(IEntryPoint indexed entryPoint, address indexed owner);
 
     // solhint-disable-next-line no-empty-blocks
     receive() external payable {}
 
-    constructor(IEntryPoint anEntryPoint, address anOwner) {
+    constructor(IEntryPoint anEntryPoint) {
         _entryPoint = anEntryPoint;
-        owner = anOwner;
     }
 
     modifier onlyOwner() {
@@ -52,23 +54,18 @@ contract SimpleAccount is BaseAccount {
     }
 
     /**
-     * transfer eth value to a destination address
-     */
-    function transfer(address payable dest, uint256 amount) external onlyOwner {
-        dest.transfer(amount);
-    }
-
-    /**
      * execute a transaction (called directly from owner, not by entryPoint)
      */
-    function exec(address dest, uint256 value, bytes calldata func) external onlyOwner {
+    function execute(address dest, uint256 value, bytes calldata func) external {
+        _requireFromEntryPointOrOwner();
         _call(dest, value, func);
     }
 
     /**
      * execute a sequence of transaction
      */
-    function execBatch(address[] calldata dest, bytes[] calldata func) external onlyOwner {
+    function executeBatch(address[] calldata dest, bytes[] calldata func) external {
+        _requireFromEntryPointOrOwner();
         require(dest.length == func.length, "wrong array lengths");
         for (uint256 i = 0; i < dest.length; i++) {
             _call(dest[i], 0, func[i]);
@@ -80,13 +77,13 @@ contract SimpleAccount is BaseAccount {
      * an account must have a method for replacing the entryPoint, in case the the entryPoint is
      * upgraded to a newer version.
      */
-    function _updateEntryPoint(address newEntryPoint) internal override {
-        emit EntryPointChanged(address(_entryPoint), newEntryPoint);
-        _entryPoint = IEntryPoint(payable(newEntryPoint));
+    function initialize(address anOwner) public virtual initializer {
+        _initialize(anOwner);
     }
 
-    function _requireFromAdmin() internal view override {
-        _onlyOwner();
+    function _initialize(address anOwner) internal virtual {
+        owner = anOwner;
+        emit SimpleAccountInitialized(_entryPoint, owner);
     }
 
     /**
@@ -97,14 +94,8 @@ contract SimpleAccount is BaseAccount {
      * - validate current nonce matches request nonce, and increment it.
      * - pay prefund, in case current deposit is not enough
      */
-    function _requireFromEntryPoint() internal override view {
-        require(msg.sender == address(entryPoint()), "account: not from EntryPoint");
-    }
-
-    // called by entryPoint, only after validateUserOp succeeded.
-    function execFromEntryPoint(address dest, uint256 value, bytes calldata func) external {
-        _requireFromEntryPoint();
-        _call(dest, value, func);
+    function _requireFromEntryPointOrOwner() internal view {
+        require(msg.sender == address(entryPoint()) || msg.sender == owner, "account: not Owner or EntryPoint");
     }
 
     /// implement template method of BaseAccount
@@ -114,11 +105,10 @@ contract SimpleAccount is BaseAccount {
 
     /// implement template method of BaseAccount
     function _validateSignature(UserOperation calldata userOp, bytes32 userOpHash, address)
-    internal override virtual returns (uint256 deadline) {
+    internal override virtual returns (uint256 sigTimeRange) {
         bytes32 hash = userOpHash.toEthSignedMessageHash();
-        //ignore signature mismatch of from==ZERO_ADDRESS (for eth_callUserOp validation purposes)
-        // solhint-disable-next-line avoid-tx-origin
-        require(owner == hash.recover(userOp.signature) || tx.origin == address(0), "account: wrong signature");
+        if (owner != hash.recover(userOp.signature))
+            return SIG_VALIDATION_FAILED;
         return 0;
     }
 
@@ -154,6 +144,11 @@ contract SimpleAccount is BaseAccount {
      */
     function withdrawDepositTo(address payable withdrawAddress, uint256 amount) public onlyOwner {
         entryPoint().withdrawTo(withdrawAddress, amount);
+    }
+
+    function _authorizeUpgrade(address newImplementation) internal view override {
+        (newImplementation);
+        _onlyOwner();
     }
 }
 

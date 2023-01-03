@@ -25,7 +25,16 @@ interface IEntryPoint is IStakeManager {
      * @param actualGasUsed - total gas used by this UserOperation (including preVerification, creation, validation and execution)
      * @param success - true if the sender transaction succeeded, false if reverted.
      */
-    event UserOperationEvent(bytes32 indexed userOpHash, address indexed sender, address indexed paymaster, uint256 nonce, uint256 actualGasCost, uint256 actualGasUsed, bool success);
+    event UserOperationEvent(bytes32 indexed userOpHash, address indexed sender, address indexed paymaster, uint256 nonce, bool success, uint256 actualGasCost, uint256 actualGasUsed);
+
+    /**
+     * account "sender" was deployed.
+     * @param userOpHash the userOp that deployed this account. UserOperationEvent will follow.
+     * @param sender the account that is deployed
+     * @param factory the factory used to deploy this account (in the initCode)
+     * @param paymaster the paymaster used by this UserOp
+     */
+    event AccountDeployed(bytes32 indexed userOpHash, address indexed sender, address factory, address paymaster);
 
     /**
      * An event emitted if the UserOperation "callData" reverted with non-zero length
@@ -35,6 +44,11 @@ interface IEntryPoint is IStakeManager {
      * @param revertReason - the return bytes from the (reverted) call to "callData".
      */
     event UserOperationRevertReason(bytes32 indexed userOpHash, address indexed sender, uint256 nonce, bytes revertReason);
+
+    /**
+     * signature aggregator used by the following UserOperationEvents within this bundle.
+     */
+    event SignatureAggregatorChanged(address aggregator);
 
     /**
      * a custom revert error of handleOps, to identify the offending op.
@@ -91,7 +105,7 @@ interface IEntryPoint is IStakeManager {
 
     /**
      * Simulate a call to account.validateUserOp and paymaster.validatePaymasterUserOp.
-     * @dev this method always revert. Successful result is SimulationResult error. other errors are failures.
+     * @dev this method always revert. Successful result is ValidationResult error. other errors are failures.
      * @dev The node must also verify it doesn't use banned opcodes, and that it doesn't reference storage outside the account's data.
      * @param userOp the user operation to validate.
      */
@@ -99,43 +113,53 @@ interface IEntryPoint is IStakeManager {
 
     /**
      * Successful result from simulateValidation.
-     * @param preOpGas the gas used for validation (including preValidationGas)
-     * @param prefund the required prefund for this operation
-     * @param deadline until what time this userOp is valid (the minimum value of account and paymaster's deadline)
+     * @param returnInfo gas and time-range returned values
+     * @param senderInfo stake information about the sender
+     * @param factoryInfo stake information about the factor (if any)
      * @param paymasterInfo stake information about the paymaster (if any)
      */
-    error SimulationResult(uint256 preOpGas, uint256 prefund, uint256 deadline, PaymasterInfo paymasterInfo);
-
-    /**
-     * returned paymaster info.
-     * If the UserOperation contains a paymaster, these fields are filled with the paymaster's stake value and delay.
-     * A bundler must verify these values are above the minimal required values, or else reject the UserOperation.
-     */
-    struct PaymasterInfo {
-        uint256 paymasterStake;
-        uint256 paymasterUnstakeDelay;
-    }
+    error ValidationResult(ReturnInfo returnInfo,
+        StakeInfo senderInfo, StakeInfo factoryInfo, StakeInfo paymasterInfo);
 
 
     /**
      * Successful result from simulateValidation, if the account returns a signature aggregator
-     * @param preOpGas the gas used for validation (including preValidationGas)
-     * @param prefund the required prefund for this operation
-     * @param deadline until what time this userOp is valid (the minimum value of account and paymaster's deadline)
+     * @param returnInfo gas and time-range returned values
+     * @param senderInfo stake information about the sender
+     * @param factoryInfo stake information about the factor (if any)
      * @param paymasterInfo stake information about the paymaster (if any)
-     * @param aggregationInfo signature aggregation info (if the account requires signature aggregator)
+     * @param aggregatorInfo signature aggregation info (if the account requires signature aggregator)
      *      bundler MUST use it to verify the signature, or reject the UserOperation
      */
-    error SimulationResultWithAggregation(uint256 preOpGas, uint256 prefund, uint256 deadline, PaymasterInfo paymasterInfo, AggregationInfo aggregationInfo);
+    error ValidationResultWithAggregation(ReturnInfo returnInfo,
+        StakeInfo senderInfo, StakeInfo factoryInfo, StakeInfo paymasterInfo,
+        AggregatorStakeInfo aggregatorInfo);
+
+    /**
+     * gas and return values during simulation
+     * @param preOpGas the gas used for validation (including preValidationGas)
+     * @param prefund the required prefund for this operation
+     * @param sigFailed validateUserOp's (or paymaster's) signature check failed
+     * @param validAfter - first timestamp this UserOp is valid (merging account and paymaster time-range)
+     * @param validUntil - last timestamp this UserOp is valid (merging account and paymaster time-range)
+     * @param paymasterContext returned by validatePaymasterUserOp (to be passed into postOp)
+     */
+    struct ReturnInfo {
+        uint256 preOpGas;
+        uint256 prefund;
+        bool sigFailed;
+        uint64 validAfter;
+        uint64 validUntil;
+        bytes paymasterContext;
+    }
 
     /**
      * returned aggregated signature info.
      * the aggregator returned by the account, and its current stake.
      */
-    struct AggregationInfo {
+    struct AggregatorStakeInfo {
         address actualAggregator;
-        uint256 aggregatorStake;
-        uint256 aggregatorUnstakeDelay;
+        StakeInfo stakeInfo;
     }
 
     /**
@@ -151,5 +175,16 @@ interface IEntryPoint is IStakeManager {
      */
     error SenderAddressResult(address sender);
 
+
+    /**
+     * simulate full execution of a UserOperation (including both validation and target execution)
+     * this method will always revert with "ExecutionResult".
+     * it performs full validation of the UserOperation, but ignores signature error.
+     * Note that in order to collect the the success/failure of the target call, it must be executed
+     * with trace enabled to track the emitted events.
+     */
+    function simulateHandleOp(UserOperation calldata op) external;
+
+    error ExecutionResult(uint256 preOpGas, uint256 paid, uint64 validAfter, uint64 validBefore);
 }
 

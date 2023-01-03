@@ -46,7 +46,7 @@ interface IStakeManager {
      * @param withdrawTime - first block timestamp where 'withdrawStake' will be callable, or zero if already locked
      * @dev sizes were chosen so that (deposit,staked) fit into one cell (used during handleOps)
      *    and the rest fit into a 2nd cell.
-     *    112 bit allows for 2^15 eth
+     *    112 bit allows for 10^15 eth
      *    64 bit for full timestamp
      *    32 bit allow 150 years for unstake delay
      */
@@ -56,6 +56,12 @@ interface IStakeManager {
         uint112 stake;
         uint32 unstakeDelaySec;
         uint64 withdrawTime;
+    }
+
+    //API struct used by getStakeInfo and simulateValidation
+    struct StakeInfo {
+        uint256 stake;
+        uint256 unstakeDelaySec;
     }
 
     function getDepositInfo(address account) external view returns (DepositInfo memory info);
