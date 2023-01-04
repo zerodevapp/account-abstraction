@@ -25,7 +25,8 @@ module.exports = {
     '.eslintrc.js',
     '**/types/truffle-contracts',
     'coverage',
-    'dist/'
+    'dist/',
+    'scripts/'
   ],
   rules: {
     'no-console': 'off',
