@@ -8,7 +8,8 @@ pragma solidity ^0.8.7;
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@gnosis.pm/safe-contracts/contracts/GnosisSafe.sol";
 import "./EIP4337Fallback.sol";
-import "../core/EntryPoint.sol";
+import "../interfaces/IAccount.sol";
+import "../interfaces/IEntryPoint.sol";
 
     using ECDSA for bytes32;
 
@@ -33,7 +34,7 @@ contract EIP4337Manager is GnosisSafe, IAccount {
      * delegate-called (using execFromModule) through the fallback, so "real" msg.sender is attached as last 20 bytes
      */
     function validateUserOp(UserOperation calldata userOp, bytes32 userOpHash, address /*aggregator*/, uint256 missingAccountFunds)
-    external override returns (uint256 deadline) {
+    external override returns (uint256 sigTimeRange) {
         address _msgSender = address(bytes20(msg.data[msg.data.length - 20 :]));
         require(_msgSender == entryPoint, "account: not from entrypoint");
 
