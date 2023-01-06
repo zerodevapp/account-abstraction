@@ -43,7 +43,11 @@ contract VerifyingPaymaster is BasePaymaster {
                 keccak256(userOp.callData),
                 userOp.callGasLimit,
                 userOp.verificationGasLimit,
-                userOp.preVerificationGas,
+                // unlike upstream, we don't include preVerificationGas in the hash.
+                // this is because the SDK computes preVerificationGas *after* acquiring
+                // a signature from the paymaster, so the preVerificationGas is not known
+                // at this time.
+                // userOp.preVerificationGas,
                 userOp.maxFeePerGas,
                 userOp.maxPriorityFeePerGas
             ));
