@@ -179,6 +179,10 @@ describe('Gnosis Proxy', function () {
 
     const newCode = await ethers.provider.getCode(counterfactualAddress)
     expect(newCode.length).eq(324)
+
+    // createAccount should return the address even when the account has been deployed
+    const accountAddress = await accountFactory.callStatic.createAccount(ownerAddress, 123)
+    expect(accountAddress).eq(counterfactualAddress)
   })
 
   it('another op after creation', async function () {
