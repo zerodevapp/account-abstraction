@@ -1,0 +1,88 @@
+{
+  "address": "0x8ae01fCF7c655655fF2c6Ef907b8B4718Ab4e17c",
+  "abi": [
+    {
+      "inputs": [],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes",
+          "name": "transactions",
+          "type": "bytes"
+        }
+      ],
+      "name": "multiSend",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    }
+  ],
+  "transactionHash": "0x511847b85392d5dce759ec14061b35594da87a57984a2acc7394de293df705fd",
+  "receipt": {
+    "to": "0x4e59b44847b379578588920cA78FbF26c0B4956C",
+    "from": "0x8d8a9Cf53b7D95C148cB159384D249F8FB68db3f",
+    "contractAddress": null,
+    "transactionIndex": 22,
+    "gasUsed": "204279",
+    "logsBloom": "0x00000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000008000000000000000000000000000200000000000000000000000000000800000000000000000000100000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000004000000100000000000041000000000000000000000000000000100000000000002000000000000000000000000000000800000000000000000000000000100000",
+    "blockHash": "0x408bd1970eab45c69109730ff0fc20800bd6f475ad892cd4ca2acca63fa2ec09",
+    "transactionHash": "0x511847b85392d5dce759ec14061b35594da87a57984a2acc7394de293df705fd",
+    "logs": [
+      {
+        "transactionIndex": 22,
+        "blockNumber": 37757088,
+        "transactionHash": "0x511847b85392d5dce759ec14061b35594da87a57984a2acc7394de293df705fd",
+        "address": "0x0000000000000000000000000000000000001010",
+        "topics": [
+          "0x4dfe1bbbcf077ddc3e01291eea2d5c70c2b422b415d95645b9adcfd678cb1d63",
+          "0x0000000000000000000000000000000000000000000000000000000000001010",
+          "0x0000000000000000000000008d8a9cf53b7d95c148cb159384d249f8fb68db3f",
+          "0x0000000000000000000000001efecb61a2f80aa34d3b9218b564a64d05946290"
+        ],
+        "data": "0x000000000000000000000000000000000000000000000000001e898e537b8e3c0000000000000000000000000000000000000000000000004820853641d89ce7000000000000000000000000000000000000000000003898db66dffb174b58410000000000000000000000000000000000000000000000004801fba7ee5d0eab000000000000000000000000000000000000000000003898db8569896ac6e67d",
+        "logIndex": 71,
+        "blockHash": "0x408bd1970eab45c69109730ff0fc20800bd6f475ad892cd4ca2acca63fa2ec09"
+      }
+    ],
+    "blockNumber": 37757088,
+    "cumulativeGasUsed": "2476304",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": [],
+  "numDeployments": 1,
+  "solcInputHash": "599f4620113b613dc92bce5d3f259c92",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.15+commit.e14f2714\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"transactions\",\"type\":\"bytes\"}],\"name\":\"multiSend\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"}],\"devdoc\":{\"author\":\"Nick Dodson - <nick.dodson@consensys.net>Gon\\u00e7alo S\\u00e1 - <goncalo.sa@consensys.net>Stefan George - <stefan@gnosis.io>Richard Meissner - <richard@gnosis.io>\",\"kind\":\"dev\",\"methods\":{\"multiSend(bytes)\":{\"details\":\"Sends multiple transactions and reverts all if one fails.\",\"params\":{\"transactions\":\"Encoded transactions. Each transaction is encoded as a packed bytes of                     operation as a uint8 with 0 for a call or 1 for a delegatecall (=> 1 byte),                     to as a address (=> 20 bytes),                     value as a uint256 (=> 32 bytes),                     data length as a uint256 (=> 32 bytes),                     data as bytes.                     see abi.encodePacked for more information on packed encoding\"}}},\"title\":\"Multi Send - Allows to batch multiple transactions into one.\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{\"multiSend(bytes)\":{\"notice\":\"This method is payable as delegatecalls keep the msg.value from the previous call         If the calling method (e.g. execTransaction) received ETH this would revert otherwise\"}},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/gnosis/MultiSend.sol\":\"MultiSend\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":1000000},\"remappings\":[]},\"sources\":{\"contracts/gnosis/MultiSend.sol\":{\"content\":\"// SPDX-License-Identifier: LGPL-3.0-only\\npragma solidity >=0.7.0 <0.9.0;\\n\\n/// @title Multi Send - Allows to batch multiple transactions into one.\\n/// @author Nick Dodson - <nick.dodson@consensys.net>\\n/// @author Gon\\u00e7alo S\\u00e1 - <goncalo.sa@consensys.net>\\n/// @author Stefan George - <stefan@gnosis.io>\\n/// @author Richard Meissner - <richard@gnosis.io>\\ncontract MultiSend {\\n    address private immutable multisendSingleton;\\n\\n    constructor() {\\n        multisendSingleton = address(this);\\n    }\\n\\n    /// @dev Sends multiple transactions and reverts all if one fails.\\n    /// @param transactions Encoded transactions. Each transaction is encoded as a packed bytes of\\n    ///                     operation as a uint8 with 0 for a call or 1 for a delegatecall (=> 1 byte),\\n    ///                     to as a address (=> 20 bytes),\\n    ///                     value as a uint256 (=> 32 bytes),\\n    ///                     data length as a uint256 (=> 32 bytes),\\n    ///                     data as bytes.\\n    ///                     see abi.encodePacked for more information on packed encoding\\n    /// @notice This method is payable as delegatecalls keep the msg.value from the previous call\\n    ///         If the calling method (e.g. execTransaction) received ETH this would revert otherwise\\n    function multiSend(bytes memory transactions) public payable {\\n        require(address(this) != multisendSingleton, \\\"MultiSend should only be called via delegatecall\\\");\\n        // solhint-disable-next-line no-inline-assembly\\n        assembly {\\n            let length := mload(transactions)\\n            let i := 0x20\\n            for {\\n                // Pre block is not used in \\\"while mode\\\"\\n            } lt(i, length) {\\n                // Post block is not used in \\\"while mode\\\"\\n            } {\\n                // First byte of the data is the operation.\\n                // We shift by 248 bits (256 - 8 [operation byte]) it right since mload will always load 32 bytes (a word).\\n                // This will also zero out unused data.\\n                let operation := shr(0xf8, mload(add(transactions, i)))\\n                // We offset the load address by 1 byte (operation byte)\\n                // We shift it right by 96 bits (256 - 160 [20 address bytes]) to right-align the data and zero out unused data.\\n                let to := shr(0x60, mload(add(transactions, add(i, 0x01))))\\n                // We offset the load address by 21 byte (operation byte + 20 address bytes)\\n                let value := mload(add(transactions, add(i, 0x15)))\\n                // We offset the load address by 53 byte (operation byte + 20 address bytes + 32 value bytes)\\n                let dataLength := mload(add(transactions, add(i, 0x35)))\\n                // We offset the load address by 85 byte (operation byte + 20 address bytes + 32 value bytes + 32 data length bytes)\\n                let data := add(transactions, add(i, 0x55))\\n                let success := 0\\n                switch operation\\n                    case 0 {\\n                        success := call(gas(), to, value, data, dataLength, 0, 0)\\n                    }\\n                    case 1 {\\n                        success := delegatecall(gas(), to, data, dataLength, 0, 0)\\n                    }\\n                if eq(success, 0) {\\n                    revert(0, 0)\\n                }\\n                // Next entry starts at 85 byte + data length\\n                i := add(i, add(0x55, dataLength))\\n            }\\n        }\\n    }\\n}\",\"keccak256\":\"0x2e5445ffe6f35884ad9ddc8ea57e6cc8f6aa167f45be937a2c73f6da62e809e9\",\"license\":\"LGPL-3.0-only\"}},\"version\":1}",
+  "bytecode": "0x60a060405234801561001057600080fd5b50306080526080516102bd61002f6000396000604f01526102bd6000f3fe60806040526004361061001e5760003560e01c80638d80ff0a14610023575b600080fd5b6100366100313660046101b8565b610038565b005b73ffffffffffffffffffffffffffffffffffffffff7f0000000000000000000000000000000000000000000000000000000000000000163003610101576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152603060248201527f4d756c746953656e642073686f756c64206f6e6c792062652063616c6c65642060448201527f7669612064656c656761746563616c6c00000000000000000000000000000000606482015260840160405180910390fd5b805160205b81811015610184578083015160f81c6001820184015160601c60158301850151603584018601516055850187016000856000811461014b576001811461015b57610166565b6000808585888a5af19150610166565b6000808585895af491505b508061017157600080fd5b5050806055018501945050505050610106565b505050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052604160045260246000fd5b6000602082840312156101ca57600080fd5b813567ffffffffffffffff808211156101e257600080fd5b818401915084601f8301126101f657600080fd5b81358181111561020857610208610189565b604051601f82017fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe0908116603f0116810190838211818310171561024e5761024e610189565b8160405282815287602084870101111561026757600080fd5b82602086016020830137600092810160200192909252509594505050505056fea2646970667358221220aee0f2dd047c52784b9c7806e4078197141e146ec66587d8610576db5f8ad20e64736f6c634300080f0033",
+  "deployedBytecode": "0x60806040526004361061001e5760003560e01c80638d80ff0a14610023575b600080fd5b6100366100313660046101b8565b610038565b005b73ffffffffffffffffffffffffffffffffffffffff7f0000000000000000000000000000000000000000000000000000000000000000163003610101576040517f08c379a000000000000000000000000000000000000000000000000000000000815260206004820152603060248201527f4d756c746953656e642073686f756c64206f6e6c792062652063616c6c65642060448201527f7669612064656c656761746563616c6c00000000000000000000000000000000606482015260840160405180910390fd5b805160205b81811015610184578083015160f81c6001820184015160601c60158301850151603584018601516055850187016000856000811461014b576001811461015b57610166565b6000808585888a5af19150610166565b6000808585895af491505b508061017157600080fd5b5050806055018501945050505050610106565b505050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052604160045260246000fd5b6000602082840312156101ca57600080fd5b813567ffffffffffffffff808211156101e257600080fd5b818401915084601f8301126101f657600080fd5b81358181111561020857610208610189565b604051601f82017fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe0908116603f0116810190838211818310171561024e5761024e610189565b8160405282815287602084870101111561026757600080fd5b82602086016020830137600092810160200192909252509594505050505056fea2646970667358221220aee0f2dd047c52784b9c7806e4078197141e146ec66587d8610576db5f8ad20e64736f6c634300080f0033",
+  "devdoc": {
+    "author": "Nick Dodson - <nick.dodson@consensys.net>Gonçalo Sá - <goncalo.sa@consensys.net>Stefan George - <stefan@gnosis.io>Richard Meissner - <richard@gnosis.io>",
+    "kind": "dev",
+    "methods": {
+      "multiSend(bytes)": {
+        "details": "Sends multiple transactions and reverts all if one fails.",
+        "params": {
+          "transactions": "Encoded transactions. Each transaction is encoded as a packed bytes of                     operation as a uint8 with 0 for a call or 1 for a delegatecall (=> 1 byte),                     to as a address (=> 20 bytes),                     value as a uint256 (=> 32 bytes),                     data length as a uint256 (=> 32 bytes),                     data as bytes.                     see abi.encodePacked for more information on packed encoding"
+        }
+      }
+    },
+    "title": "Multi Send - Allows to batch multiple transactions into one.",
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {
+      "multiSend(bytes)": {
+        "notice": "This method is payable as delegatecalls keep the msg.value from the previous call         If the calling method (e.g. execTransaction) received ETH this would revert otherwise"
+      }
+    },
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [],
+    "types": null
+  }
+}
