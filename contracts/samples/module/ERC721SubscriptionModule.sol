@@ -77,8 +77,9 @@ contract ERC721SubscriptionModule is Module {
 
     // meant to be delegate called
     function transferETH() payable public {
-        (bool sent, bytes memory data) = sender.call{value: msg.value}("");
+        (bool sent, ) = sender.call{value: msg.value}("");
         require(sent, "Failed to send Ether");
     }
+
 }
  

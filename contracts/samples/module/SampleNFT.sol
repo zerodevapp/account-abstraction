@@ -9,11 +9,8 @@ contract SampleNFT is ERC721 {
 
     constructor() ERC721("SampleNFT", "SNFT") {}
 
-    function mint(address to, uint256 _tokenId) public {
-        _safeMint(to, _tokenId);
-    }
-
-    function mintOne(address to) public {
-        _safeMint(to, tokenId++);
+    // Anyone can mint an NFT for anyone
+    function mint(address _to) public {
+        _safeMint(_to, tokenId++);
     }
 }
