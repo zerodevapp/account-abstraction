@@ -5,6 +5,11 @@ import hre from 'hardhat'
 const gasPrice = ethers.utils.parseUnits('30', 'gwei')
 
 async function main() {
+  const receiver = process.env.RECEIVER
+  if (!receiver) {
+    throw new Error('RECEIVER env var not set')
+  }
+
   const signer = hre.ethers.provider.getSigner()
   const { paymasterOwner: sender } = (await hre.getNamedAccounts())
   const senderSigner = hre.ethers.provider.getSigner(sender)
@@ -15,11 +20,12 @@ async function main() {
   const nft = await hre.deployments.get('SampleNFT')
   const nftContract = (await hre.ethers.getContractAt('SampleNFT', nft.address)).connect(signer)
 
-  const tokenId = 7
+  // figure out the next token id to be minted
+  const tokenId = await nftContract.tokenId()
 
   // mint an NFT to sender
   console.log('minting NFT')
-  let tx = await nftContract.mint(senderSigner.getAddress(), tokenId, {
+  let tx = await nftContract.mint(senderSigner.getAddress(), {
     gasPrice,
   })
   await tx.wait()
@@ -32,7 +38,7 @@ async function main() {
   await tx.wait()
 
   console.log('triggering payment')
-  tx = await moduleContract.triggerPayment(tokenId, {
+  tx = await moduleContract.triggerPayment(receiver, tokenId, {
     gasPrice,
     gasLimit: 1000000,
   })

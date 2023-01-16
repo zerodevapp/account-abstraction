@@ -2,13 +2,13 @@ import { HardhatRuntimeEnvironment } from 'hardhat/types'
 import { DeployFunction } from 'hardhat-deploy/types'
 import { ethers } from 'ethers'
 
-const ownerAddr = '0x56860862E9d391aAa53Cff0F6A2f952452c3748a'
+// the sender we use in demo
+const SENDER = '0x4F7810B609035Fa48D535A39B69ab82E6E83dC5A'
 const price = ethers.utils.parseEther('0.01')
 const period = 60 // seconds
 
 const deploySampleModule: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const from = await hre.ethers.provider.getSigner().getAddress()
-  const { paymasterOwner: sender } = (await hre.getNamedAccounts())
 
   const sampleNFT = await hre.deployments.deploy(
     'SampleNFT', {
@@ -21,7 +21,7 @@ const deploySampleModule: DeployFunction = async function (hre: HardhatRuntimeEn
   const module = await hre.deployments.deploy(
     'ERC721SubscriptionModule', {
     from,
-    args: [ownerAddr, sampleNFT.address, sender, price, period],
+    args: [sampleNFT.address, SENDER, price, period],
     deterministicDeployment: true,
   })
   console.log('==sample module addr=', module.address)
