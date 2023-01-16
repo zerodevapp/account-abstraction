@@ -41,10 +41,10 @@ contract EIP4337Fallback is DefaultCallbackHandler, IAccount {
      * called from the Safe. delegate actual work to EIP4337Manager
      */
     function executeAndRevert(
-        address to,
-        uint256 value,
-        bytes memory data,
-        Enum.Operation operation
+        address,
+        uint256,
+        bytes memory,
+        Enum.Operation
     ) external {
         delegateToManager();
     }
