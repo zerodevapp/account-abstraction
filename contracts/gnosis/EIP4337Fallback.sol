@@ -17,7 +17,7 @@ contract EIP4337Fallback is DefaultCallbackHandler, IAccount {
     /**
      * delegate the contract call to the EIP4337Manager
      */
-    function delegateToManager() internal {
+    function delegateToManager() internal returns (bytes memory) {
         // delegate entire msg.data (including the appended "msg.sender") to the EIP4337Manager
         // will work only for GnosisSafe contracts
         GnosisSafe safe = GnosisSafe(payable(msg.sender));
@@ -27,14 +27,15 @@ contract EIP4337Fallback is DefaultCallbackHandler, IAccount {
                 revert(add(ret, 32), mload(ret))
             }
         }
+        return ret;
     }
 
     /**
      * called from the Safe. delegate actual work to EIP4337Manager
      */
     function validateUserOp(UserOperation calldata, bytes32, address, uint256) override external returns (uint256 deadline){
-        delegateToManager();
-        return 0;
+        bytes memory ret = delegateToManager();
+        return abi.decode(ret, (uint256));
     }
 
     /**

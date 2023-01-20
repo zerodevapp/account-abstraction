@@ -480,7 +480,6 @@ contract EntryPoint is IEntryPoint, StakeManager {
      */
     function _validatePrepayment(uint256 opIndex, UserOperation calldata userOp, UserOpInfo memory outOpInfo, address aggregator)
     private returns (uint256 sigTimeRange, uint256 paymasterTimeRange, address actualAggregator) {
-
         uint256 preGas = gasleft();
         MemoryUserOp memory mUserOp = outOpInfo.mUserOp;
         _copyUserOpToMemory(userOp, mUserOp);
