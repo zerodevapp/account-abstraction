@@ -46,7 +46,6 @@ contract EIP4337Manager is GnosisSafe, IAccount {
         bytes32 hash = userOpHash.toEthSignedMessageHash();
         address recovered = hash.recover(userOp.signature);
         require(threshold == 1, "account: only threshold 1");
-
         if (!pThis.isOwner(recovered)) {
             sigTimeRange = SIG_VALIDATION_FAILED;
         }
