@@ -67,7 +67,7 @@ describe('Gnosis Proxy', function () {
     counter = await new TestCounter__factory(ethersSigner).deploy()
 
     accountFactory = await new GnosisSafeAccountFactory__factory(ethersSigner)
-      .deploy(proxyFactory.address, safeSingleton.address, manager.address)
+      .deploy("PREFIX", proxyFactory.address, safeSingleton.address, manager.address)
 
     await accountFactory.createAccount(ownerAddress, 0)
     // we use our accountFactory to create and configure the proxy.
@@ -151,7 +151,7 @@ describe('Gnosis Proxy', function () {
     console.log('gasUsed=', rcpt.gasUsed, rcpt.transactionHash)
 
     // decode the revertReason
-    const ev = rcpt.events!.find(ev => ev.event === 'UserOperationRevertReason')!
+    const ev = rcpt.events!.find(ev => ev.event === 'UserOperationRevertReason')!;
     let message = ev.args!.revertReason
     if (message.startsWith('0x08c379a0')) {
       // Error(string)
@@ -265,8 +265,6 @@ describe('Gnosis Proxy', function () {
       const replaceManagerCallData = manager.interface.encodeFunctionData('replaceEIP4337Manager',
         [prev, oldManager, newManager.address])
       await proxySafe.execTransaction(manager.address, 0, replaceManagerCallData, 1, 1e6, 0, 0, AddressZero, AddressZero, signature).then(async r => r.wait())
-
-      // console.log(rcpt.events?.slice(-1)[0].event)
 
       expect(await proxySafe.isModuleEnabled(newEntryPoint.address)).to.equal(true)
       expect(await proxySafe.isModuleEnabled(newFallback)).to.equal(true)
