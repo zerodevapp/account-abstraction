@@ -10,24 +10,41 @@ import "../utils/Exec.sol";
  */
 contract GnosisSafeAccountFactory {
 
+    string public prefix;
+
     GnosisSafeProxyFactory public immutable proxyFactory;
     address public immutable safeSingleton;
     EIP4337Manager public immutable eip4337Manager;
 
-    constructor(GnosisSafeProxyFactory _proxyFactory, address _safeSingleton, EIP4337Manager _eip4337Manager) {
+    constructor(
+        string memory _prefix,
+        GnosisSafeProxyFactory _proxyFactory,
+        address _safeSingleton,
+        EIP4337Manager _eip4337Manager
+    ) {
+        prefix = _prefix;
         proxyFactory = _proxyFactory;
         safeSingleton = _safeSingleton;
         eip4337Manager = _eip4337Manager;
     }
 
-    function createAccount(address owner, uint salt) public returns (address) {
-        address addr = getAddress(owner, salt);
+    function encodeSalt(address owner, uint256 salt) public view returns(uint256) {
+        return uint256(keccak256(
+            abi.encodePacked(prefix, owner, salt)
+        ));
+    }
+
+    function createAccount(address owner, uint salt) public returns (address addr) {
+        addr = getAddress(owner, salt);
         uint codeSize = addr.code.length;
         if (codeSize > 0) {
             return addr;
         }
-        return address(proxyFactory.createProxyWithNonce(
-                safeSingleton, getInitializer(owner), salt));
+        proxyFactory.createProxyWithNonce(
+            safeSingleton, "", encodeSalt(owner, salt)
+        );
+        (bool success, bytes memory ret) = addr.call(getInitializer(owner));
+        require(success, string(ret));
     }
 
     function getInitializer(address owner) internal view returns (bytes memory) {
@@ -44,7 +61,7 @@ contract GnosisSafeAccountFactory {
             address (eip4337Manager), setup4337Modules,
             eip4337fallback,
             address(0), 0, payable(0) //no payment receiver
-            ));
+        ));
     }
 
     /**
@@ -52,9 +69,8 @@ contract GnosisSafeAccountFactory {
     * (uses the same "create2 signature" used by GnosisSafeProxyFactory.createProxyWithNonce)
     */
     function getAddress(address owner, uint salt) public view returns (address) {
-        bytes memory initializer = getInitializer(owner);
         //copied from deployProxyWithNonce
-        bytes32 salt2 = keccak256(abi.encodePacked(keccak256(initializer), salt));
+        bytes32 salt2 = keccak256(abi.encodePacked(keccak256(""), encodeSalt(owner, salt)));
         bytes memory deploymentData = abi.encodePacked(proxyFactory.proxyCreationCode(), uint256(uint160(safeSingleton)));
         return Create2.computeAddress(bytes32(salt2), keccak256(deploymentData), address (proxyFactory));
     }
