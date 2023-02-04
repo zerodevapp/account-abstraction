@@ -9,7 +9,7 @@ contract TestCounter {
         counters[msg.sender] = counters[msg.sender] + 1;
     }
 
-    function countFail() public {
+    function countFail() public pure {
         revert("count failed");
     }
 
