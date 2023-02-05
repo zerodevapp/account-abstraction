@@ -90,7 +90,7 @@ contract EIP4337Manager is IAccount, GnosisSafeStorage, Executor {
             value,
             data,
             operation,
-            gasleft()
+            type(uint256).max
         );
 
         bytes memory returnData;
