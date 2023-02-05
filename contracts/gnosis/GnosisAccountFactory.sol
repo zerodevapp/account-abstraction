@@ -16,6 +16,8 @@ contract GnosisSafeAccountFactory {
     address public immutable safeSingleton;
     EIP4337Manager public immutable eip4337Manager;
 
+    event AccountCreated(address indexed account, address indexed owner, uint salt);
+
     constructor(
         string memory _prefix,
         GnosisSafeProxyFactory _proxyFactory,
@@ -40,9 +42,12 @@ contract GnosisSafeAccountFactory {
         if (codeSize > 0) {
             return addr;
         }
-        proxyFactory.createProxyWithNonce(
+
+        address account = address(proxyFactory.createProxyWithNonce(
             safeSingleton, "", encodeSalt(owner, salt)
-        );
+        ));
+        emit AccountCreated(account, owner, salt);
+
         (bool success, bytes memory ret) = addr.call(getInitializer(owner));
         require(success, string(ret));
     }
