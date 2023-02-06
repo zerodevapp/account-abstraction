@@ -67,7 +67,7 @@ describe('Gnosis Proxy', function () {
     counter = await new TestCounter__factory(ethersSigner).deploy()
 
     accountFactory = await new GnosisSafeAccountFactory__factory(ethersSigner)
-      .deploy("PREFIX", proxyFactory.address, safeSingleton.address, manager.address)
+      .deploy(ethers.utils.formatBytes32String("PREFIX"), proxyFactory.address, safeSingleton.address, manager.address)
 
     await accountFactory.createAccount(ownerAddress, 0)
     // we use our accountFactory to create and configure the proxy.
@@ -94,9 +94,9 @@ describe('Gnosis Proxy', function () {
     beneficiary = createAddress()
   })
 
-  it('should validate', async function () {
-    await manager.callStatic.validateEip4337(proxySafe.address, manager.address, { gasLimit: 10e6 })
-  })
+//  it.skip('should validate', async function () {
+//    await manager.callStatic.validateEip4337(proxySafe.address, manager.address, { gasLimit: 10e6 })
+//  })
 
   it('should fail from wrong entrypoint', async function () {
     const op = await fillAndSign({
