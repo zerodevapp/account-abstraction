@@ -155,34 +155,8 @@ contract EIP4337Manager is IAccount, GnosisSafeStorage, Executor {
         pThis.enableModule(newManager.entryPoint());
         pThis.enableModule(eip4337fallback);
         pThis.setFallbackHandler(eip4337fallback);
-
-        validateEip4337(pThis, newManager);
     }
 
-    /**
-     * Validate this gnosisSafe is callable through the EntryPoint.
-     * the test is might be incomplete: we check that we reach our validateUserOp and fail on signature.
-     *  we don't test full transaction
-     */
-    function validateEip4337(GnosisSafe safe, EIP4337Manager manager) public {
-        // this prevent mistaken replaceEIP4337Manager to disable the module completely.
-        // minimal signature that pass "recover"
-        bytes memory sig = new bytes(65);
-        sig[64] = bytes1(uint8(27));
-        sig[2] = bytes1(uint8(1));
-        sig[35] = bytes1(uint8(1));
-        UserOperation memory userOp = UserOperation(address(safe), uint256(nonce), "", "", 0, 1000000, 0, 0, 0, "", sig);
-        UserOperation[] memory userOps = new UserOperation[](1);
-        userOps[0] = userOp;
-        IEntryPoint _entryPoint = IEntryPoint(payable(manager.entryPoint()));
-        try _entryPoint.handleOps(userOps, payable(msg.sender)) {
-            revert("validateEip4337: handleOps must fail");
-        } catch (bytes memory error) {
-            if (keccak256(error) != keccak256(abi.encodeWithSignature("FailedOp(uint256,address,string)", 0, address(0), "AA24 signature error"))) {
-                revert(string(error));
-            }
-        }
-    }
     /**
      * enumerate modules, and find the currently active EIP4337 manager (and previous module)
      * @return prev prev module, needed by replaceEIP4337Manager
