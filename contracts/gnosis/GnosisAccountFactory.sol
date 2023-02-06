@@ -10,7 +10,7 @@ import "../utils/Exec.sol";
  */
 contract GnosisSafeAccountFactory {
 
-    string public prefix;
+    bytes32 public immutable prefix;
 
     GnosisSafeProxyFactory public immutable proxyFactory;
     address public immutable safeSingleton;
@@ -19,7 +19,7 @@ contract GnosisSafeAccountFactory {
     event AccountCreated(address indexed account, address indexed owner, uint salt);
 
     constructor(
-        string memory _prefix,
+        bytes32 _prefix,
         GnosisSafeProxyFactory _proxyFactory,
         address _safeSingleton,
         EIP4337Manager _eip4337Manager
