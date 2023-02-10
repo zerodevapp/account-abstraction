@@ -8,12 +8,12 @@ import {
   EIP4337Fallback__factory,
   EntryPoint,
   EntryPoint__factory,
-  GnosisSafe,
-  GnosisSafeAccountFactory,
-  GnosisSafeAccountFactory__factory,
+  ModifiedGnosisSafe,
+  ModifiedGnosisSafeAccountFactory,
+  ModifiedGnosisSafeAccountFactory__factory,
   GnosisSafeProxy,
   GnosisSafeProxyFactory__factory,
-  GnosisSafe__factory,
+  ModifiedGnosisSafe__factory,
   TestCounter,
   TestCounter__factory
 } from '../typechain'
@@ -30,22 +30,22 @@ import { fillAndSign } from './UserOp'
 import { defaultAbiCoder, hexConcat, hexZeroPad, parseEther } from 'ethers/lib/utils'
 import { expect } from 'chai'
 
-describe('Gnosis Proxy', function () {
+describe('Modified Gnosis Proxy', function () {
   this.timeout(30000)
 
   let ethersSigner: Signer
-  let safeSingleton: GnosisSafe
+  let safeSingleton: ModifiedGnosisSafe
   let owner: Signer
   let ownerAddress: string
   let proxy: GnosisSafeProxy
   let manager: EIP4337Manager
   let entryPoint: EntryPoint
   let counter: TestCounter
-  let proxySafe: GnosisSafe
+  let proxySafe: ModifiedGnosisSafe
   let safe_execTxCallData: string
   let safe_execFailTxCallData: string
 
-  let accountFactory: GnosisSafeAccountFactory
+  let accountFactory: ModifiedGnosisSafeAccountFactory
 
   before('before', async function () {
     // EIP4337Manager fails to compile with solc-coverage
@@ -56,18 +56,18 @@ describe('Gnosis Proxy', function () {
     const provider = ethers.provider
     ethersSigner = provider.getSigner()
 
+    entryPoint = await deployEntryPoint()
     // standard safe singleton contract (implementation)
-    safeSingleton = await new GnosisSafe__factory(ethersSigner).deploy()
+    safeSingleton = await new ModifiedGnosisSafe__factory(ethersSigner).deploy(entryPoint.address)
     // standard safe proxy factory
     const proxyFactory = await new GnosisSafeProxyFactory__factory(ethersSigner).deploy()
-    entryPoint = await deployEntryPoint()
     manager = await new EIP4337Manager__factory(ethersSigner).deploy(entryPoint.address)
     owner = createAccountOwner()
     ownerAddress = await owner.getAddress()
     counter = await new TestCounter__factory(ethersSigner).deploy()
 
-    accountFactory = await new GnosisSafeAccountFactory__factory(ethersSigner)
-      .deploy(ethers.utils.formatBytes32String("PREFIX"), proxyFactory.address, safeSingleton.address, manager.address)
+    accountFactory = await new ModifiedGnosisSafeAccountFactory__factory(ethersSigner)
+      .deploy(ethers.utils.formatBytes32String("MODIFIED-PREFIX"), proxyFactory.address, safeSingleton.address, entryPoint.address)
 
     const rcpt = await accountFactory.createAccount(ownerAddress, 0).then(async r => r.wait())
     console.log('Deploy gasUsed=', rcpt.gasUsed, rcpt.transactionHash)
@@ -77,7 +77,7 @@ describe('Gnosis Proxy', function () {
     const addr = ev[0].args.proxy
 
     proxy =
-      proxySafe = GnosisSafe__factory.connect(addr, owner)
+      proxySafe = ModifiedGnosisSafe__factory.connect(addr, owner)
 
     await ethersSigner.sendTransaction({
       to: proxy.address,
