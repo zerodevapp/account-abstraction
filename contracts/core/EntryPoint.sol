@@ -16,6 +16,7 @@ import "../interfaces/IEntryPoint.sol";
 import "../utils/Exec.sol";
 import "./StakeManager.sol";
 import "./SenderCreator.sol";
+import "hardhat/console.sol";
 
 contract EntryPoint is IEntryPoint, StakeManager {
 
@@ -399,6 +400,7 @@ contract EntryPoint is IEntryPoint, StakeManager {
         }
         try IAccount(sender).validateUserOp{gas : mUserOp.verificationGasLimit}(op, opInfo.userOpHash, aggregator, missingAccountFunds)
         returns (uint256 _sigTimeRange) {
+            console.log("validate success");
             sigTimeRange = _sigTimeRange;
         } catch Error(string memory revertReason) {
             revert FailedOp(opIndex, address(0), revertReason);
