@@ -148,13 +148,15 @@ describe('Modified Gnosis Proxy', function () {
     })
     const template = await new SmartWallet__factory(ethersSigner).deploy();
     const proxy = await (await ethers.getContractFactory("@biconomy/wallet-contracts/contracts/smart-contract-wallet/Proxy.sol:Proxy")).deploy(template.address);
+    const g1 = (await proxy.deployTransaction.wait()).gasUsed
     const handler = await (await ethers.getContractFactory("@biconomy/wallet-contracts/contracts/smart-contract-wallet/handler/DefaultCallbackHandler.sol:DefaultCallbackHandler")).deploy();
     const sender = SmartWallet__factory.connect(proxy.address, ethers.provider);
-    await sender.connect(owner).init(
+    const g2 = await sender.connect(owner).init(
       await owner.getAddress(),
       entryPoint.address,
       handler.address
-    );
+    ).then(async r => r.wait());
+    console.log(g1.add(g2.gasUsed));
     const counter_countCallData = counter.interface.encodeFunctionData('count')
     const callData = sender.interface.encodeFunctionData('execFromEntryPoint', [counter.address, 0, counter_countCallData, 0, 1e6]);
 
@@ -167,8 +169,6 @@ describe('Modified Gnosis Proxy', function () {
       callGasLimit: 1e6,
       callData: callData
     }, owner, entryPoint)
-    console.log(op);
-    console.log("atleast here");
     const log = await sender.callStatic.validateUserOp(op, await entryPoint.getUserOpHash(op), ethers.constants.AddressZero, 0, {from:entryPoint.address});
     console.log(log);
     const rcpt = await entryPoint.handleOps([op], beneficiary).then(async r => r.wait())
