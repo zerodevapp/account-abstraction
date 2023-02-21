@@ -3,7 +3,7 @@ import { DeployFunction } from 'hardhat-deploy/types'
 import { ethers } from 'ethers'
 
 // the sender we use in demo
-const SENDER = '0x4F7810B609035Fa48D535A39B69ab82E6E83dC5A'
+const SENDER = '0x4c10a098b428EE91e6ebBDDE89427E6D45B32A7D'
 const price = ethers.utils.parseEther('0.01')
 const period = 60 // seconds
 

@@ -43,6 +43,8 @@ contract ERC721SubscriptionModule {
         period = _period;
     }
 
+    // sender calls this function to transfer an NFT to the receiver
+    // and trigger a payment
     function triggerPayment(address _receiver, uint256 _tokenId) public {
         // grab the NFT, which presumably has been approved by the sender
         erc721collection.transferFrom(sender, _receiver, _tokenId);
@@ -69,7 +71,7 @@ contract ERC721SubscriptionModule {
         lastPayments[_receiver] = block.timestamp;
     }
 
-    // meant to be delegate called
+    // receiver calls this function to transfer payment to the sender
     function transferETH() payable public {
         (bool sent, ) = sender.call{value: msg.value}("");
         require(sent, "Failed to send Ether");
