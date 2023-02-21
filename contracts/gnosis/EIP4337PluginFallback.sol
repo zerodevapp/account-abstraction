@@ -9,12 +9,14 @@ import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/interfaces/IERC1271.sol";
 import "../interfaces/IAccount.sol";
 import "./EIP4337Manager.sol";
+import "@openzeppelin/contracts/utils/cryptography/draft-EIP712.sol";
+import "../interfaces/IPlugin.sol";
 
     using ECDSA for bytes32;
 
-contract EIP4337PluginFallback is DefaultCallbackHandler, IAccount, IERC1271 {
+contract EIP4337PluginFallback is DefaultCallbackHandler, IAccount, IERC1271, EIP712 {
     address immutable public defaultEIP4337Manager;
-    constructor(address _eip4337manager) {
+    constructor(address _eip4337manager) EIP712("EIP4337PluginFallback", "1.0.0") {
         defaultEIP4337Manager = _eip4337manager;
     }
 
@@ -37,11 +39,28 @@ contract EIP4337PluginFallback is DefaultCallbackHandler, IAccount, IERC1271 {
     /**
      * delegate the contract call to the plugin
      */
-    function delegateToPlugin(address plugin) internal returns (bytes memory) {
+    function delegateToPlugin(
+        address plugin,
+        UserOperation calldata userOp,
+        bytes32 opHash,
+        address aggregator,
+        uint256 missingAccountFunds
+    ) internal returns (bytes memory) {
         // delegate entire msg.data (including the appended "msg.sender") to the EIP4337Manager
         // will work only for GnosisSafe contracts
         GnosisSafe safe = GnosisSafe(payable(msg.sender));
-        (bool success, bytes memory ret) = safe.execTransactionFromModuleReturnData(plugin, 0, msg.data, Enum.Operation.DelegateCall);
+        abi.encodeWithSelector(IPlugin.validatePluginData.selector, 
+            userOp,
+            opHash,
+            aggregator,
+            missingAccountFunds
+        );
+        (bool success, bytes memory ret) = safe.execTransactionFromModuleReturnData(
+            plugin,
+            0,
+            msg.data,
+            Enum.Operation.DelegateCall
+        );
         if (!success) {
             assembly {
                 revert(add(ret, 32), mload(ret))
@@ -53,16 +72,37 @@ contract EIP4337PluginFallback is DefaultCallbackHandler, IAccount, IERC1271 {
     /**
      * called from the Safe. delegate actual work to EIP4337Manager
      */
-    function validateUserOp(UserOperation calldata userOp, bytes32, address, uint256) override external returns (uint256 deadline){
+    function validateUserOp(UserOperation calldata userOp, bytes32 opHash, address aggregator, uint256 missingAccountFunds) override external returns (uint256 deadline){
         if(userOp.signature.length == 65){
             bytes memory ret = delegateToManager();
             return abi.decode(ret, (uint256));
-        } if(userOp.signature.length > 85){ // address + signature + data
-            (address plugin, bytes memory signature) = abi.decode(userOp.signature, (address, bytes));
-            bytes32 hashWithPlugin = keccak256(abi.encodePacked(UserOperationLib.hash(userOp), plugin));
-            require(IERC1271(msg.sender).isValidSignature(hashWithPlugin, signature) == 0x1626ba7e, "Invalid signature");
-            bytes memory ret = delegateToPlugin(plugin);
-            return abi.decode(ret, (uint256));
+        } if(userOp.signature.length > 85){ // address(plugin) + validUntil + validAfter + signature + data
+            require(userOp.initCode.length == 0, "not in init");
+            address plugin = address(bytes20(userOp.signature[0:20]));
+            uint48 validUntil = uint48(bytes6(userOp.signature[20:26]));
+            uint48 validAfter = uint48(bytes6(userOp.signature[26:32]));
+            bytes memory signature = userOp.signature[32:97];
+            (bytes memory data, ) = abi.decode(userOp.signature[97:], (bytes, bytes));
+            bytes32 digest = _hashTypedDataV4(keccak256(abi.encode(
+                keccak256("ValidateUserOpPlugin(address sender,uint256 nonce,uint48 validUntil,uint48 validAfter,address plugin,bytes data)"), // we are going to trust plugin for verification
+                userOp.sender,
+                userOp.nonce,
+                validUntil,
+                validAfter,
+                plugin,
+                data
+            )));
+            require(IERC1271(msg.sender).isValidSignature(digest, signature) == 0x1626ba7e, "Invalid signature");
+            require(GnosisSafe(payable(msg.sender)).nonce() == userOp.nonce, "Invalid nonce"); // we allow nonce reuse only when it is current nonce
+            bytes memory ret = delegateToPlugin(
+                plugin,
+                userOp,
+                opHash,
+                aggregator,
+                missingAccountFunds
+            );
+            bool res = abi.decode(ret, (bool));
+            return packSigTimeRange(!res, validUntil, validAfter);
         } else {
             revert("Invalid signature");
         }
@@ -95,5 +135,9 @@ contract EIP4337PluginFallback is DefaultCallbackHandler, IAccount, IERC1271 {
         } else {
             return 0xffffffff;
         }
+    }
+
+    function packSigTimeRange(bool sigFailed, uint48 validUntil, uint48 validAfter) internal pure returns (uint256) {
+        return uint256(sigFailed ? 1 : 0) | uint256(validUntil << 8) | uint256(validAfter << (48+8));
     }
 }
