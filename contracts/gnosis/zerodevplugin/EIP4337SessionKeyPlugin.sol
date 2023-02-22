@@ -9,11 +9,12 @@ import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@gnosis.pm/safe-contracts/contracts/GnosisSafe.sol";
 import "@gnosis.pm/safe-contracts/contracts/base/Executor.sol";
 import "@gnosis.pm/safe-contracts/contracts/examples/libraries/GnosisSafeStorage.sol";
-import "./EIP4337Fallback.sol";
-import "../utils/BytesLib.sol";
-import "../interfaces/IAccount.sol";
-import "../interfaces/IEntryPoint.sol";
-import "../interfaces/IPlugin.sol";
+import "@openzeppelin/contracts/utils/cryptography/draft-EIP712.sol";
+import "../../utils/BytesLib.sol";
+import "../../interfaces/IAccount.sol";
+import "../../interfaces/IEntryPoint.sol";
+import "./IPlugin.sol";
+import "hardhat/console.sol";
 
     using ECDSA for bytes32;
 /**
@@ -23,28 +24,45 @@ import "../interfaces/IPlugin.sol";
  * holds an immutable reference to the EntryPoint
  * Inherits GnosisSafeStorage so that it can reference the memory storage
  */
-contract EIP4337SessionKeyPlugin is IPlugin, GnosisSafeStorage, Executor {
+struct SessionKeyStorageStruct {
+    mapping(address => bool) revoked;
+    mapping(address => uint256) sessionNonce;
+}
+contract EIP4337SessionKeyPlugin is IPlugin, GnosisSafeStorage, Executor, EIP712 {
 
     address public immutable pluginFallback;
     address public immutable entryPoint;
 
-    mapping(address => bool) public revoked;
-    mapping(address => uint256) public sessionNonce;
+    function getSessionKeyStorage() internal pure returns (SessionKeyStorageStruct storage s) {
+        bytes32 position = bytes32(uint256(keccak256("zero-dev.account.eip4337.sessionkey")) - 1);
+        assembly {
+            s.slot := position
+        }
+    }
 
     // return value in case of signature failure, with no time-range.
     // equivalent to packSigTimeRange(true,0,0);
     uint256 constant internal SIG_VALIDATION_FAILED = 1;
 
-    constructor(address _entryPoint, address _pluginFallback) {
+    event SessionKeyRevoked(address indexed key);
+
+    constructor(address _entryPoint, address _pluginFallback) EIP712("EIP4337SessionKeyPlugin", "1.0.0") {
         entryPoint = _entryPoint;
         pluginFallback = _pluginFallback;
     }
 
     // revoke session key
     function revokeSessionKey(address _key) external {
-        GnosisSafe pThis = GnosisSafe(payable(address(this)));
-        require(pThis.isOwner(msg.sender), "account: not owner");
-        revoked[_key] = true;
+        getSessionKeyStorage().revoked[_key] = true;
+        emit SessionKeyRevoked(_key);
+    }
+
+    function revoked(address _key) external view returns (bool) {
+        return getSessionKeyStorage().revoked[_key];
+    }
+
+    function sessionNonce(address _key) external view returns (uint256) {
+        return getSessionKeyStorage().sessionNonce[_key];
     }
 
     /**
@@ -57,23 +75,27 @@ contract EIP4337SessionKeyPlugin is IPlugin, GnosisSafeStorage, Executor {
         uint256 missingAccountFunds
     )
     external override returns (bool) {
-        require(address(bytes20(userOp.signature[0:20])) == address(this), "!this");
+        // console.log("[:20]", address(bytes20(userOp.signature[0:20])));
+
+        // require(address(bytes20(userOp.signature[0:20])) == address(this), "!this");
         require(msg.sender == pluginFallback, "account: not from eip4337Fallback");
-        address _msgSender = address(bytes20(msg.data[msg.data.length - 20 :]));
-        require(_msgSender == entryPoint, "account: not from entrypoint");
+        // address _msgSender = address(bytes20(msg.data[msg.data.length - 20 :]));
+        // require(_msgSender == entryPoint, "account: not from entrypoint");
         // data = sessionKey
         // data offset starts at 97
         (bytes memory data, bytes memory signature) = abi.decode(userOp.signature[97:], (bytes, bytes));
         address sessionKey = address(bytes20(BytesLib.slice(data,0,20)));
-        require(!revoked[sessionKey]);
-        bytes32 hash = keccak256(
-            abi.encodePacked(userOpHash, sessionNonce[sessionKey]++)
-        ).toEthSignedMessageHash();
-        address recovered = hash.recover(signature);
+        require(!getSessionKeyStorage().revoked[sessionKey]);
+        bytes32 digest = _hashTypedDataV4(keccak256(abi.encode(
+            keccak256("Session(bytes32 userOpHash,uint256 nonce)"), // we are going to trust plugin for verification
+            userOpHash,
+            getSessionKeyStorage().sessionNonce[sessionKey]++
+        )));
+        address recovered = digest.recover(signature);
         require(recovered == sessionKey, "account: invalid signature");
         if (missingAccountFunds > 0) {
             //TODO: MAY pay more than the minimum, to deposit for future transactions
-            (bool success,) = payable(_msgSender).call{value : missingAccountFunds}("");
+            (bool success,) = payable(entryPoint).call{value : missingAccountFunds}("");
             (success);
             //ignore failure (its EntryPoint's job to verify, not account.)
         }
