@@ -75,12 +75,8 @@ contract EIP4337SessionKeyPlugin is IPlugin, GnosisSafeStorage, Executor, EIP712
         uint256 missingAccountFunds
     )
     external override returns (bool) {
-        // console.log("[:20]", address(bytes20(userOp.signature[0:20])));
-
         // require(address(bytes20(userOp.signature[0:20])) == address(this), "!this");
         require(msg.sender == pluginFallback, "account: not from eip4337Fallback");
-        // address _msgSender = address(bytes20(msg.data[msg.data.length - 20 :]));
-        // require(_msgSender == entryPoint, "account: not from entrypoint");
         // data = sessionKey
         // data offset starts at 97
         (bytes memory data, bytes memory signature) = abi.decode(userOp.signature[97:], (bytes, bytes));

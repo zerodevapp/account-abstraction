@@ -80,7 +80,8 @@ contract EIP4337PluginFallback is DefaultCallbackHandler, IAccount, IERC1271, EI
         if(userOp.signature.length == 65){
             bytes memory ret = delegateToManager();
             return abi.decode(ret, (uint256));
-        } if(userOp.signature.length > 85){ // address(plugin) + validUntil + validAfter + data + signature
+        } if(userOp.signature.length > 97){
+            // userOp.signature = address(plugin) + validUntil + validAfter + pluginData + pluginSignature
             require(userOp.initCode.length == 0, "not in init");
             address plugin = address(bytes20(userOp.signature[0:20]));
             uint48 validUntil = uint48(bytes6(userOp.signature[20:26]));
@@ -98,6 +99,7 @@ contract EIP4337PluginFallback is DefaultCallbackHandler, IAccount, IERC1271, EI
             )));
             GnosisSafe safe = GnosisSafe(payable(msg.sender));
             address signer = digest.recover(signature);
+            require(safe.threshold() == 1, "cannot use plugin with threshold > 1");
             require(safe.isOwner(signer), "Invalid signature");
             bytes memory ret = delegateToPlugin(
                 plugin,
@@ -113,6 +115,10 @@ contract EIP4337PluginFallback is DefaultCallbackHandler, IAccount, IERC1271, EI
         }
     }
 
+    /// @notice Query plugin for data
+    /// @dev this function will always fail, it should be used only to query plugin for data using error message
+    /// @param _plugin Plugin address
+    /// @param _data Data to query
     function queryPlugin(address _plugin, bytes calldata _data) external returns(bytes memory){
         (bool success, bytes memory _ret) = ModuleManager(msg.sender).execTransactionFromModuleReturnData(
             _plugin,
