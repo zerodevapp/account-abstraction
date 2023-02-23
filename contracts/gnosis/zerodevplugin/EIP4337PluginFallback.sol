@@ -89,9 +89,8 @@ contract EIP4337PluginFallback is DefaultCallbackHandler, IAccount, IERC1271, EI
             (bytes memory data, ) = abi.decode(userOp.signature[97:], (bytes, bytes));
 
             bytes32 digest = _hashTypedDataV4(keccak256(abi.encode(
-                keccak256("ValidateUserOpPlugin(address sender,uint256 nonce,uint48 validUntil,uint48 validAfter,address plugin,bytes data)"), // we are going to trust plugin for verification
+                keccak256("ValidateUserOpPlugin(address sender,uint48 validUntil,uint48 validAfter,address plugin,bytes data)"), // we are going to trust plugin for verification
                 userOp.sender,
-                userOp.nonce,
                 validUntil,
                 validAfter,
                 plugin,
@@ -100,7 +99,6 @@ contract EIP4337PluginFallback is DefaultCallbackHandler, IAccount, IERC1271, EI
             GnosisSafe safe = GnosisSafe(payable(msg.sender));
             address signer = digest.recover(signature);
             require(safe.isOwner(signer), "Invalid signature");
-            require(GnosisSafe(payable(msg.sender)).nonce() == userOp.nonce, "Invalid nonce"); // we allow nonce reuse only when it is current nonce
             bytes memory ret = delegateToPlugin(
                 plugin,
                 userOp,

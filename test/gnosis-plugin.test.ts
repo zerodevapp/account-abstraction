@@ -233,7 +233,6 @@ async function signSessionKey(
   }
   const value = {
     sender : userOp.sender,
-    nonce : (await (await GnosisSafe__factory.connect(userOp.sender!, owner)).nonce()).toString(),
     validUntil : validUntil,
     validAfter : validAfter,
     plugin : plugin.address,
@@ -244,7 +243,6 @@ async function signSessionKey(
       {
         "ValidateUserOpPlugin" : [
           {name: "sender", type: "address"},
-          {name: "nonce", type: "uint256"},
           {name: "validUntil", type: "uint48"},
           {name: "validAfter", type: "uint48"},
           {name: "plugin", type: "address"},
@@ -262,7 +260,7 @@ async function signSessionKey(
   ]);
   return {
     ...op,
-    nonce : value.nonce,
+    nonce : 0,
     signature : signature
   };
 }
