@@ -16,6 +16,7 @@ import "../../interfaces/IEntryPoint.sol";
 import "./IPlugin.sol";
 import "../ZeroDevPluginSafe.sol";
 import "./policy/IPolicy.sol";
+import "hardhat/console.sol";
     using ECDSA for bytes32;
 /**
  * Main EIP4337 module.
@@ -82,7 +83,7 @@ contract ZeroDevPolicyPlugin is IPlugin, GnosisSafeStorage, Executor, EIP712 {
 
         address policy = address(bytes20(BytesLib.slice(data,20,20)));
         require(_checkPolicy(policy, userOp.callData), "account: policy failed");
-        
+
         bytes32 digest = _hashTypedDataV4(keccak256(abi.encode(
             keccak256("Session(bytes32 userOpHash,uint256 nonce)"), // we are going to trust plugin for verification
             userOpHash,
