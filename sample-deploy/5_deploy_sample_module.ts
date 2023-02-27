@@ -12,18 +12,18 @@ const deploySampleModule: DeployFunction = async function (hre: HardhatRuntimeEn
 
   const sampleNFT = await hre.deployments.deploy(
     'SampleNFT', {
-    from,
-    args: [],
-    deterministicDeployment: true,
-  })
+      from,
+      args: [],
+      deterministicDeployment: true
+    })
   console.log('==sample NFT addr=', sampleNFT.address)
 
   const module = await hre.deployments.deploy(
     'ERC721SubscriptionModule', {
-    from,
-    args: [sampleNFT.address, SENDER, price, period],
-    deterministicDeployment: true,
-  })
+      from,
+      args: [sampleNFT.address, SENDER, price, period],
+      deterministicDeployment: true
+    })
   console.log('==sample module addr=', module.address)
 }
 

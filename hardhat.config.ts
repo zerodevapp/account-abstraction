@@ -1,5 +1,4 @@
 import * as dotenv from 'dotenv'
-dotenv.config()
 
 import '@nomiclabs/hardhat-waffle'
 import '@typechain/hardhat'
@@ -10,19 +9,20 @@ import '@nomiclabs/hardhat-etherscan'
 import 'solidity-coverage'
 
 import * as fs from 'fs'
+dotenv.config()
 
 const mnemonicFileName = process.env.MNEMONIC_FILE ?? `${process.env.HOME}/.secret/testnet-mnemonic.txt`
 let mnemonic = 'test '.repeat(11) + 'junk'
 if (fs.existsSync(mnemonicFileName)) { mnemonic = fs.readFileSync(mnemonicFileName, 'ascii') }
 
-function getNetwork1(url: string): { url: string, accounts: { mnemonic: string } } {
+function getNetwork1 (url: string): { url: string, accounts: { mnemonic: string } } {
   return {
     url,
     accounts: { mnemonic }
   }
 }
 
-function getNetwork(name: string): { url: string, accounts: { mnemonic: string } } {
+function getNetwork (name: string): { url: string, accounts: { mnemonic: string } } {
   return getNetwork1(`https://${name}.infura.io/v3/${process.env.INFURA_ID}`)
   // return getNetwork1(`wss://${name}.infura.io/ws/v3/${process.env.INFURA_ID}`)
 }
@@ -59,33 +59,33 @@ const config: HardhatUserConfig = {
     kovan: getNetwork('kovan'),
     mumbai: {
       url: `https://polygon-mumbai.infura.io/v3/${process.env.INFURA_ID}`,
-      accounts: [process.env.DEPLOYER_PRIVATE_KEY!, process.env.PAYMASTER_OWNER_PRIVATE_KEY!],
+      accounts: [process.env.DEPLOYER_PRIVATE_KEY!, process.env.PAYMASTER_OWNER_PRIVATE_KEY!]
     },
     polygon: {
       url: `https://polygon-mainnet.infura.io/v3/${process.env.INFURA_ID}`,
-      accounts: [process.env.DEPLOYER_PRIVATE_KEY!, process.env.PAYMASTER_OWNER_PRIVATE_KEY!],
+      accounts: [process.env.DEPLOYER_PRIVATE_KEY!, process.env.PAYMASTER_OWNER_PRIVATE_KEY!]
     },
     avalanche: {
       url: `https://avalanche-mainnet.infura.io/v3/${process.env.INFURA_ID}`,
-      accounts: [process.env.DEPLOYER_PRIVATE_KEY!, process.env.PAYMASTER_OWNER_PRIVATE_KEY!],
+      accounts: [process.env.DEPLOYER_PRIVATE_KEY!, process.env.PAYMASTER_OWNER_PRIVATE_KEY!]
     },
     fuji: {
       url: `https://avalanche-fuji.infura.io/v3/${process.env.INFURA_ID}`,
-      accounts: [process.env.DEPLOYER_PRIVATE_KEY!, process.env.PAYMASTER_OWNER_PRIVATE_KEY!],
+      accounts: [process.env.DEPLOYER_PRIVATE_KEY!, process.env.PAYMASTER_OWNER_PRIVATE_KEY!]
     },
     goerli: {
       url: `https://goerli.infura.io/v3/${process.env.INFURA_ID}`,
-      accounts: [process.env.DEPLOYER_PRIVATE_KEY!, process.env.PAYMASTER_OWNER_PRIVATE_KEY!],
+      accounts: [process.env.DEPLOYER_PRIVATE_KEY!, process.env.PAYMASTER_OWNER_PRIVATE_KEY!]
     },
     mainnet: {
       url: `https://mainnet.infura.io/v3/${process.env.INFURA_ID}`,
-      accounts: [process.env.DEPLOYER_PRIVATE_KEY!, process.env.PAYMASTER_OWNER_PRIVATE_KEY!],
-    },
+      accounts: [process.env.DEPLOYER_PRIVATE_KEY!, process.env.PAYMASTER_OWNER_PRIVATE_KEY!]
+    }
   },
 
   namedAccounts: {
     paymasterOwner: {
-      default: `privatekey://${process.env.PAYMASTER_OWNER_PRIVATE_KEY!}`,
+      default: `privatekey://${process.env.PAYMASTER_OWNER_PRIVATE_KEY!}`
     }
   },
 

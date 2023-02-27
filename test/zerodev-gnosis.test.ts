@@ -15,7 +15,7 @@ import {
   ZeroDevSessionKeyPlugin,
   ZeroDevSessionKeyPlugin__factory,
   FunctionSignaturePolicy,
-  FunctionSignaturePolicy__factory,
+  FunctionSignaturePolicy__factory
 } from '../typechain'
 import {
   AddressZero,
@@ -31,13 +31,12 @@ import { defaultAbiCoder, hexConcat, hexZeroPad, parseEther } from 'ethers/lib/u
 import { expect } from 'chai'
 import { UserOperation } from './UserOperation'
 
-
 describe.only('ZeroDev Gnosis Proxy', function () {
   this.timeout(30000)
 
   let ethersSigner: Signer
   let safeSingleton: ZeroDevPluginSafe
-  let sessionKeyPlugin : ZeroDevSessionKeyPlugin
+  let sessionKeyPlugin: ZeroDevSessionKeyPlugin
   let owner: Signer
   let ownerAddress: string
   let proxy: GnosisSafeProxy
@@ -67,7 +66,7 @@ describe.only('ZeroDev Gnosis Proxy', function () {
     ownerAddress = await owner.getAddress()
     counter = await new TestCounter__factory(ethersSigner).deploy()
 
-    sessionKeyPlugin = await new ZeroDevSessionKeyPlugin__factory(ethersSigner).deploy();
+    sessionKeyPlugin = await new ZeroDevSessionKeyPlugin__factory(ethersSigner).deploy()
 
     accountFactory = await new ZeroDevGnosisSafeAccountFactory__factory(ethersSigner)
       .deploy(proxyFactory.address, safeSingleton.address)
@@ -93,7 +92,6 @@ describe.only('ZeroDev Gnosis Proxy', function () {
   beforeEach(() => {
     beneficiary = createAddress()
   })
-
 
   it.skip('should fail from wrong entrypoint', async function () { // i don't know how to handle this properly i'll leave it a TODO
     const op = await fillAndSign({
@@ -201,81 +199,81 @@ describe.only('ZeroDev Gnosis Proxy', function () {
     console.log('gasUsed=', rcpt.gasUsed, rcpt.transactionHash)
   })
 
-  describe('policy session key', async function(){
-    let sessionKey : Signer;
-    let userSignedUserOp : UserOperation;
-    let policy : FunctionSignaturePolicy;
-    let policyPlugin : ZeroDevSessionKeyPlugin;
-    beforeEach(async function() {
-        policy = await new FunctionSignaturePolicy__factory(ethersSigner).deploy(
-          [{
-            to : counter.address,
-            sig : counter.interface.getSighash('count') 
-          }]
-        );
+  describe('policy session key', async function () {
+    let sessionKey: Signer
+    let userSignedUserOp: UserOperation
+    let policy: FunctionSignaturePolicy
+    let policyPlugin: ZeroDevSessionKeyPlugin
+    beforeEach(async function () {
+      policy = await new FunctionSignaturePolicy__factory(ethersSigner).deploy(
+        [{
+          to: counter.address,
+          sig: counter.interface.getSighash('count')
+        }]
+      )
 
-        policyPlugin = await new ZeroDevSessionKeyPlugin__factory(ethersSigner).deploy();
-        sessionKey = createAccountOwner(); // use random session key
-        let userOp = {
-          sender: proxy.address,
-          callGasLimit: 1e6,
-          callData: safe_execTxCallData,
-          verificationGasLimit: 1e6,
-        }
-        userSignedUserOp = await approvePlugin(
-          owner,
-          userOp,
-          1777068462,
-          0,
-          policyPlugin.address,
-          hexConcat([
-            hexZeroPad(await sessionKey.getAddress(),20),
-            hexZeroPad(policy.address,20)
-          ]),
-          entryPoint
-        );
-        // fund wallet some eth for gas
-        await ethersSigner.sendTransaction({
-          to: proxy.address,
-          value: parseEther('10')
-        });
-    });
+      policyPlugin = await new ZeroDevSessionKeyPlugin__factory(ethersSigner).deploy()
+      sessionKey = createAccountOwner() // use random session key
+      const userOp = {
+        sender: proxy.address,
+        callGasLimit: 1e6,
+        callData: safe_execTxCallData,
+        verificationGasLimit: 1e6
+      }
+      userSignedUserOp = await approvePlugin(
+        owner,
+        userOp,
+        1777068462,
+        0,
+        policyPlugin.address,
+        hexConcat([
+          hexZeroPad(await sessionKey.getAddress(), 20),
+          hexZeroPad(policy.address, 20)
+        ]),
+        entryPoint
+      )
+      // fund wallet some eth for gas
+      await ethersSigner.sendTransaction({
+        to: proxy.address,
+        value: parseEther('10')
+      })
+    })
 
-    it("should exec", async function() {
+    it('should exec', async function () {
       const signedUserOp = await signUserOpWithSessionKey(
         userSignedUserOp,
         sessionKey,
         policyPlugin,
         policy,
         entryPoint
-      );
+      )
 
-      const count_before = await counter.counters(proxy.address);
-      const nonce_before = await getSessionNonce(policyPlugin, proxy.address, sessionKey);
+      const count_before = await counter.counters(proxy.address)
+      const nonce_before = await getSessionNonce(policyPlugin, proxy.address, sessionKey)
       const rcpt = await entryPoint.handleOps([signedUserOp], beneficiary).then(async r => r.wait())
       const ev = rcpt.events!.find(ev => ev.event === 'UserOperationEvent')!
       expect(ev.args!.success).to.eq(true)
-      expect(await counter.counters(proxy.address)).to.eq(count_before.add(1));
-      const nonce_after = await getSessionNonce(policyPlugin, proxy.address, sessionKey);
-      expect(nonce_after).to.be.eq(ethers.BigNumber.from(nonce_before).add(1));
-    });
-    it("should be able to exec multiple times with same user signature", async function() {
+      expect(await counter.counters(proxy.address)).to.eq(count_before.add(1))
+      const nonce_after = await getSessionNonce(policyPlugin, proxy.address, sessionKey)
+      expect(nonce_after).to.be.eq(ethers.BigNumber.from(nonce_before).add(1))
+    })
+    it('should be able to exec multiple times with same user signature', async function () {
       let signedUserOp = await signUserOpWithSessionKey(
         userSignedUserOp,
         sessionKey,
         policyPlugin,
         policy,
         entryPoint
-      );
+      )
 
-      let count_before = await counter.counters(proxy.address);
-      let nonce_before = await getSessionNonce(policyPlugin, proxy.address, sessionKey);
+      let count_before = await counter.counters(proxy.address)
+      let nonce_before = await getSessionNonce(policyPlugin, proxy.address, sessionKey)
       let rcpt = await entryPoint.handleOps([signedUserOp], beneficiary).then(async r => r.wait())
       let ev = rcpt.events!.find(ev => ev.event === 'UserOperationEvent')!
       expect(ev.args!.success).to.eq(true)
-      expect(await counter.counters(proxy.address)).to.eq(count_before.add(1));
-      let nonce_after = await getSessionNonce(policyPlugin, proxy.address, sessionKey);
-      expect(nonce_after).to.be.eq(ethers.BigNumber.from(nonce_before).add(1));
+      expect(await counter.counters(proxy.address)).to.eq(count_before.add(1))
+      let nonce_after = await getSessionNonce(policyPlugin, proxy.address, sessionKey)
+      expect(nonce_after).to.be.eq(ethers.BigNumber.from(nonce_before).add(1))
 
       signedUserOp = await signUserOpWithSessionKey(
         userSignedUserOp,
@@ -283,126 +281,126 @@ describe.only('ZeroDev Gnosis Proxy', function () {
         policyPlugin,
         policy,
         entryPoint
-      );
+      )
 
-      count_before = await counter.counters(proxy.address);
-      nonce_before = await getSessionNonce(policyPlugin, proxy.address, sessionKey);
+      count_before = await counter.counters(proxy.address)
+      nonce_before = await getSessionNonce(policyPlugin, proxy.address, sessionKey)
       rcpt = await entryPoint.handleOps([signedUserOp], beneficiary).then(async r => r.wait())
       ev = rcpt.events!.find(ev => ev.event === 'UserOperationEvent')!
       expect(ev.args!.success).to.eq(true)
-      expect(await counter.counters(proxy.address)).to.eq(count_before.add(1));
-      nonce_after = await getSessionNonce(policyPlugin, proxy.address, sessionKey);
-      expect(nonce_after).to.be.eq(ethers.BigNumber.from(nonce_before).add(1));
-    });
+      expect(await counter.counters(proxy.address)).to.eq(count_before.add(1))
+      nonce_after = await getSessionNonce(policyPlugin, proxy.address, sessionKey)
+      expect(nonce_after).to.be.eq(ethers.BigNumber.from(nonce_before).add(1))
+    })
   })
 })
 
-async function getSessionNonce(
-  plugin : ZeroDevSessionKeyPlugin,
-  sender : string,
-  sessionKey : Signer
-) : Promise<number> {
+async function getSessionNonce (
+  plugin: ZeroDevSessionKeyPlugin,
+  sender: string,
+  sessionKey: Signer
+): Promise<number> {
   return await ZeroDevPluginSafe__factory.connect(sender, plugin.provider).callStatic
-  .queryPlugin(plugin.address, plugin.interface.encodeFunctionData('sessionNonce', [await sessionKey.getAddress()])).catch(e => {
-    if(e.errorName !== "QueryResult") {
-      throw e;
-    }
-    return e.errorArgs.result;
-  });
+    .queryPlugin(plugin.address, plugin.interface.encodeFunctionData('sessionNonce', [await sessionKey.getAddress()])).catch(e => {
+      if (e.errorName !== 'QueryResult') {
+        throw e
+      }
+      return e.errorArgs.result
+    })
 }
 
-async function approvePlugin(
-  owner : Signer,
-  userOp : Partial<UserOperation>,
+async function approvePlugin (
+  owner: Signer,
+  userOp: Partial<UserOperation>,
   validUntil: number,
-  validAfter:number,
-  pluginAddress : string,
-  data : string,
+  validAfter: number,
+  pluginAddress: string,
+  data: string,
   entryPoint?: EntryPoint
-) : Promise<UserOperation> {
+): Promise<UserOperation> {
   const op = await fillAndSign(userOp, owner, entryPoint)
   const provider = entryPoint?.provider
   const domain = {
-    name : "ZeroDevPluginSafe",
-    version: "1.0.0",
+    name: 'ZeroDevPluginSafe',
+    version: '1.0.0',
     verifyingContract: userOp.sender,
     chainId: (await provider!.getNetwork()).chainId
   }
   const value = {
-    sender : userOp.sender,
-    validUntil : validUntil,
-    validAfter : validAfter,
-    plugin : pluginAddress,
-    data : data
+    sender: userOp.sender,
+    validUntil: validUntil,
+    validAfter: validAfter,
+    plugin: pluginAddress,
+    data: data
   }
   const userSig = await owner._signTypedData(
-      domain,
-      {
-        "ValidateUserOpPlugin" : [
-          {name: "sender", type: "address"},
-          {name: "validUntil", type: "uint48"},
-          {name: "validAfter", type: "uint48"},
-          {name: "plugin", type: "address"},
-          {name: "data", type: "bytes"}
-        ]
-      },
-      value
-  );
+    domain,
+    {
+      ValidateUserOpPlugin: [
+        { name: 'sender', type: 'address' },
+        { name: 'validUntil', type: 'uint48' },
+        { name: 'validAfter', type: 'uint48' },
+        { name: 'plugin', type: 'address' },
+        { name: 'data', type: 'bytes' }
+      ]
+    },
+    value
+  )
 
   const signature = hexConcat([
     hexZeroPad(pluginAddress, 20),
     hexZeroPad(validUntil, 6),
     hexZeroPad(validAfter, 6),
-    userSig,
-  ]);
+    userSig
+  ])
   return {
     ...op,
-    nonce : 0,
-    signature : signature
-  };
+    nonce: 0,
+    signature: signature
+  }
 }
 
-async function signUserOpWithSessionKey(
-  userOp : UserOperation,
-  sessionKey : Signer,
-  plugin : ZeroDevSessionKeyPlugin,
-  policy : FunctionSignaturePolicy,
+async function signUserOpWithSessionKey (
+  userOp: UserOperation,
+  sessionKey: Signer,
+  plugin: ZeroDevSessionKeyPlugin,
+  policy: FunctionSignaturePolicy,
   entryPoint?: EntryPoint
 ): Promise<UserOperation> {
-  let op = await fillUserOp(userOp, entryPoint);
-  const provider = entryPoint?.provider;
-  const chainId = await provider!.getNetwork().then(net => net.chainId);
-  const opHash = await getUserOpHash(op, entryPoint!.address, chainId);
+  const op = await fillUserOp(userOp, entryPoint)
+  const provider = entryPoint?.provider
+  const chainId = await provider!.getNetwork().then(net => net.chainId)
+  const opHash = await getUserOpHash(op, entryPoint!.address, chainId)
   const sessionDomain = {
-    name : "ZeroDevSessionKeyPlugin",
-    version: "1.0.0",
+    name: 'ZeroDevSessionKeyPlugin',
+    version: '1.0.0',
     verifyingContract: userOp.sender,
     chainId: chainId
-  };
+  }
 
-  const nonce = await getSessionNonce(plugin, userOp.sender!, sessionKey);
+  const nonce = await getSessionNonce(plugin, userOp.sender!, sessionKey)
   const sessionKeySig = await sessionKey._signTypedData(
     sessionDomain,
     {
-      "Session" : [
-        {name: "userOpHash", type: "bytes32"},
-        {name: "nonce", type: "uint256"},
+      Session: [
+        { name: 'userOpHash', type: 'bytes32' },
+        { name: 'nonce', type: 'uint256' }
       ]
     },
     {
-      userOpHash : opHash,
-      nonce : nonce //await plugin.sessionNonce(await sessionKey.getAddress())
+      userOpHash: opHash,
+      nonce: nonce // await plugin.sessionNonce(await sessionKey.getAddress())
     }
-  );
+  )
 
   return {
     ...op,
-    signature : hexConcat([
+    signature: hexConcat([
       op.signature,
-      ethers.utils.defaultAbiCoder.encode(["bytes","bytes"], [
-        hexConcat([hexZeroPad(await sessionKey.getAddress(), 20),hexZeroPad(policy.address, 20)]),
+      ethers.utils.defaultAbiCoder.encode(['bytes', 'bytes'], [
+        hexConcat([hexZeroPad(await sessionKey.getAddress(), 20), hexZeroPad(policy.address, 20)]),
         sessionKeySig
       ])
     ])
-  };
+  }
 }

@@ -14,10 +14,10 @@ const deployAccountFactory: DeployFunction = async function (hre: HardhatRuntime
 
   const accountFactory = await hre.deployments.deploy(
     'GnosisSafeAccountFactory', {
-    from,
-    args: [utils.id(PREFIX), PROXY_FACTORY_ADDRESS, SAFE_SINGLETON, manager.address],
-    deterministicDeployment: true,
-  })
+      from,
+      args: [utils.id(PREFIX), PROXY_FACTORY_ADDRESS, SAFE_SINGLETON, manager.address],
+      deterministicDeployment: true
+    })
 
   console.log('==account factory addr=', accountFactory.address)
 }

@@ -9,10 +9,10 @@ const deployUpdateSingleton: DeployFunction = async function (hre: HardhatRuntim
 
   const updateSingleton = await hre.deployments.deploy(
     'UpdateSingleton', {
-    from,
-    args: [],
-    deterministicDeployment: true,
-  })
+      from,
+      args: [],
+      deterministicDeployment: true
+    })
 
   console.log('==update singleton addr=', updateSingleton.address)
 

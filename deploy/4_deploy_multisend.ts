@@ -9,10 +9,10 @@ const deployMultisend: DeployFunction = async function (hre: HardhatRuntimeEnvir
 
   const multisend = await hre.deployments.deploy(
     'MultiSend', {
-    from,
-    args: [],
-    deterministicDeployment: true,
-  })
+      from,
+      args: [],
+      deterministicDeployment: true
+    })
 
   console.log('==multisend addr=', multisend.address)
 
