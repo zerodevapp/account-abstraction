@@ -62,6 +62,7 @@ contract ZeroDevPluginSafe is GnosisSafe, IAccount, EIP712 {
 
     function validateUserOp(UserOperation calldata userOp, bytes32 userOpHash, uint256 missingAccountFunds)
     external returns (uint256 validationData) {
+        require(msg.sender == entryPoint, "account: not from entryPoint");
         if(userOp.signature.length == 65){
             return _validateUserOp(userOp, userOpHash, missingAccountFunds);
         } else if(userOp.signature.length > 97) {
@@ -98,7 +99,6 @@ contract ZeroDevPluginSafe is GnosisSafe, IAccount, EIP712 {
 
     function _validateUserOp(UserOperation calldata userOp, bytes32 userOpHash, uint256 missingAccountFunds)
     internal returns (uint256 validationData) {
-        require(msg.sender == entryPoint, "account: not from eip4337Fallback");
         bytes32 hash = ECDSA.toEthSignedMessageHash(userOpHash);
         address recovered = ECDSA.recover(hash,userOp.signature);
 

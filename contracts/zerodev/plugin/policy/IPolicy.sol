@@ -3,7 +3,7 @@
 pragma solidity ^0.8.0;
 
 import "@gnosis.pm/safe-contracts/contracts/common/Enum.sol";
-
+import "../../../interfaces/UserOperation.sol";
 interface IPolicy {
     function executeAndRevert(
         address to,

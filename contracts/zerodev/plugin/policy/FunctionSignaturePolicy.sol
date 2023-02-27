@@ -1,11 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "../../../utils/BytesLib.sol";
 import "./IPolicy.sol";
 import "../../ZeroDevPluginSafe.sol";
 
-using BytesLib for bytes;
 contract FunctionSignaturePolicy is IPolicy {
     struct Policy {
         address to;
