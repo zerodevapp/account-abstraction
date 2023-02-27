@@ -2,6 +2,7 @@ import './aa.init'
 import { ethers } from 'hardhat'
 import { Signer } from 'ethers'
 import {
+  EIP4337Fallback__factory,
   EIP4337Manager,
   EIP4337Manager__factory,
   EntryPoint,
@@ -125,7 +126,7 @@ describe('Gnosis Proxy', function () {
     }, owner, entryPoint)
     // invalidate the signature
     op.callGasLimit = 1
-    await expect(entryPoint.handleOps([op], beneficiary)).to.revertedWith('FailedOp(0, "0x0000000000000000000000000000000000000000", "AA24 signature error")')
+    await expect(entryPoint.handleOps([op], beneficiary)).to.revertedWith('FailedOp(0, "AA24 signature error")')
   })
 
   it('should exec', async function () {
@@ -205,6 +206,21 @@ describe('Gnosis Proxy', function () {
     console.log('gasUsed=', rcpt.gasUsed, rcpt.transactionHash)
   })
 
+  it('should validate ERC1271 signatures', async function () {
+    const safe = EIP4337Fallback__factory.connect(proxySafe.address, ethersSigner)
+
+    const message = ethers.utils.hexlify(ethers.utils.toUtf8Bytes('hello erc1271'))
+    const dataHash = ethers.utils.arrayify(ethers.utils.keccak256(message))
+
+    const sig = await owner.signMessage(dataHash)
+    expect(await safe.isValidSignature(dataHash, sig)).to.be.eq('0x1626ba7e')
+
+    // make an sig invalid
+    const badWallet = ethers.Wallet.createRandom()
+    const badSig = await badWallet.signMessage(dataHash)
+    expect(await safe.isValidSignature(dataHash, badSig)).to.be.not.eq('0x1626ba7e')
+  })
+
   context('#replaceEIP4337', () => {
     let signature: string
     let newEntryPoint: EntryPoint
@@ -244,7 +260,7 @@ describe('Gnosis Proxy', function () {
       expect(oldManager.toLowerCase()).to.eq(manager.address.toLowerCase())
       await ethersSigner.sendTransaction({
         to: ownerAddress,
-        value: parseEther('0.1')
+        value: parseEther('33')
       })
 
       const replaceManagerCallData = manager.interface.encodeFunctionData('replaceEIP4337Manager',

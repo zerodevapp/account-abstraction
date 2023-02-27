@@ -37,14 +37,14 @@ abstract contract ZeroDevBasePlugin is IPlugin, Executor, EIP712 {
     function parseDataAndSignature(
         bytes calldata _packed
     ) public view returns(bytes calldata data, bytes calldata signature) {
-        uint256 data_position = uint256(bytes32(_packed[0:32]));
-        uint256 data_length = uint256(bytes32(_packed[data_position:data_position+32]));
-        uint256 signature_position = uint256(bytes32(_packed[32:64]));
-        uint256 signature_length = uint256(bytes32(_packed[signature_position:signature_position+32]));
-        data = _packed[data_position+32:data_position+32+data_length];
-        signature = _packed[signature_position+32:signature_position+32+signature_length];
+        uint256 dataPosition = uint256(bytes32(_packed[0:32]));
+        uint256 dataLength = uint256(bytes32(_packed[dataPosition:dataPosition+32]));
+        uint256 signaturePosition = uint256(bytes32(_packed[32:64]));
+        uint256 signatureLength = uint256(bytes32(_packed[signaturePosition:signaturePosition+32]));
+        data = _packed[dataPosition+32:dataPosition+32+dataLength];
+        signature = _packed[signaturePosition+32:signaturePosition+32+signatureLength];
 
-        require(data_position + 64 + ((data_length) / 32) * 32 == signature_position, "invalid data");
-        require(signature_position + 64 + ((signature_length) / 32) * 32 == _packed.length, "invalid signature");
+        require(dataPosition + 64 + ((dataLength) / 32) * 32 == signaturePosition, "invalid data");
+        require(signaturePosition + 64 + ((signatureLength) / 32) * 32 == _packed.length, "invalid signature");
     }
 }

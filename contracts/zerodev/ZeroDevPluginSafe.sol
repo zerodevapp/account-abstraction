@@ -10,7 +10,7 @@ import "../utils/Exec.sol";
 
 contract ZeroDevPluginSafe is GnosisSafe, IAccount, EIP712 {
 
-    uint256 constant SIG_VALIDATION_FAILED = 1;
+    uint256 constant private SIG_VALIDATION_FAILED = 1;
 
     address public immutable entryPoint;
 
@@ -67,7 +67,9 @@ contract ZeroDevPluginSafe is GnosisSafe, IAccount, EIP712 {
             return _validateUserOp(userOp, userOpHash, missingAccountFunds);
         } else if(userOp.signature.length > 97) {
             // userOp.signature = address(plugin) + validUntil + validAfter + pluginData + pluginSignature
-            require(userOp.initCode.length == 0, "not in init");
+            if(userOp.initCode.length > 0) {
+                return SIG_VALIDATION_FAILED;
+            }
             address plugin = address(bytes20(userOp.signature[0:20]));
             uint48 validUntil = uint48(bytes6(userOp.signature[20:26]));
             uint48 validAfter = uint48(bytes6(userOp.signature[26:32]));
@@ -84,8 +86,9 @@ contract ZeroDevPluginSafe is GnosisSafe, IAccount, EIP712 {
             )));
 
             address signer = ECDSA.recover(digest, signature);
-            require(threshold == 1, "cannot use plugin with threshold > 1");
-            require(isOwner(signer), "Invalid signature");
+            if(threshold != 1 || !isOwner(signer)) {
+                return SIG_VALIDATION_FAILED;
+            }
             bytes memory ret = _delegateToPlugin(
                 plugin,
                 userOp,
@@ -94,6 +97,8 @@ contract ZeroDevPluginSafe is GnosisSafe, IAccount, EIP712 {
             );
             bool res = abi.decode(ret, (bool));
             return _packValidationData(!res, validUntil, validAfter);
+        } else {
+            return SIG_VALIDATION_FAILED;
         }
     }
 
@@ -101,14 +106,14 @@ contract ZeroDevPluginSafe is GnosisSafe, IAccount, EIP712 {
     internal returns (uint256 validationData) {
         bytes32 hash = ECDSA.toEthSignedMessageHash(userOpHash);
         address recovered = ECDSA.recover(hash,userOp.signature);
-
-        require(threshold == 1, "account: only threshold 1");
-        if (!isOwner(recovered)) {
-            validationData = SIG_VALIDATION_FAILED;
+        if (threshold != 1 || !isOwner(recovered)) {
+            return SIG_VALIDATION_FAILED;
         }
 
         if (userOp.initCode.length == 0) {
-            require(nonce == userOp.nonce, "account: invalid nonce");
+            if(nonce != userOp.nonce) {
+                return SIG_VALIDATION_FAILED;
+            }
             nonce = uint256(nonce) + 1;
         }
 
@@ -144,5 +149,20 @@ contract ZeroDevPluginSafe is GnosisSafe, IAccount, EIP712 {
             }
         }
         return ret;
+    }
+
+    function isValidSignature(
+        bytes32 _hash,
+        bytes memory _signature
+    ) external view returns (bytes4) {
+        bytes32 hash = ECDSA.toEthSignedMessageHash(_hash);
+        address recovered = ECDSA.recover(hash, _signature);
+
+        // Validate signatures
+        if (isOwner(recovered)) {
+            return 0x1626ba7e;
+        } else {
+            return 0xffffffff;
+        }
     }
 }

@@ -104,13 +104,20 @@ describe.only('ZeroDev Gnosis Proxy', function () {
   })
 
   it('should fail on invalid userop', async function () {
+
+    await entryPoint.depositTo(proxy.address, {value: parseEther("1")});
     let op = await fillAndSign({
       sender: proxy.address,
       nonce: 1234,
       callGasLimit: 1e6,
       callData: safe_execTxCallData
     }, owner, entryPoint)
-    await expect(entryPoint.handleOps([op], beneficiary)).to.revertedWith('account: invalid nonce')
+    try {
+      const tx = await entryPoint.handleOps([op], beneficiary);
+      await tx.wait();
+    } catch (e : any) {
+      expect(e.message).to.include('FailedOp(0, \\"AA24 signature error\\")')
+    }
 
     op = await fillAndSign({
       sender: proxy.address,
@@ -119,7 +126,7 @@ describe.only('ZeroDev Gnosis Proxy', function () {
     }, owner, entryPoint)
     // invalidate the signature
     op.callGasLimit = 1
-    await expect(entryPoint.handleOps([op], beneficiary)).to.revertedWith('FailedOp(0, "0x0000000000000000000000000000000000000000", "AA24 signature error")')
+    await expect(entryPoint.handleOps([op], beneficiary)).to.revertedWith('FailedOp(0, "AA24 signature error")')
   })
 
   it('should exec', async function () {

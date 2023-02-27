@@ -63,10 +63,14 @@ contract ZeroDevSessionKeyPlugin is ZeroDevBasePlugin {
         bytes calldata signature
     ) internal override returns (bool) {
         address sessionKey = address(bytes20(data[0:20]));
-        require(!getPolicyStorage().revoked[sessionKey]);
+        if(getPolicyStorage().revoked[sessionKey]) {
+            return false;
+        }
 
         address policy = address(bytes20(data[20:40]));
-        require(_checkPolicy(policy, userOp.callData), "account: policy failed");
+        if(!_checkPolicy(policy, userOp.callData)) {
+            return false;
+        }
 
         bytes32 digest = _hashTypedDataV4(keccak256(abi.encode(
             keccak256("Session(bytes32 userOpHash,uint256 nonce)"), // we are going to trust plugin for verification
