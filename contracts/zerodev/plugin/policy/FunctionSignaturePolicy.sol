@@ -3,13 +3,14 @@ pragma solidity ^0.8.0;
 
 import "./IPolicy.sol";
 import "../../ZeroDevPluginSafe.sol";
+import "@openzeppelin/contracts/utils/Create2.sol";
+
+struct Policy {
+    address to;
+    bytes4 sig;
+}
 
 contract FunctionSignaturePolicy is IPolicy {
-    struct Policy {
-        address to;
-        bytes4 sig;
-    }
-
     mapping(address => mapping(bytes4 => bool)) public policies;
 
     constructor(Policy[] memory _policies) {
@@ -36,3 +37,4 @@ contract FunctionSignaturePolicy is IPolicy {
         return policies[to][selector];
     }
 }
+

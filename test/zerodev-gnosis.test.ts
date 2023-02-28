@@ -15,7 +15,9 @@ import {
   ZeroDevSessionKeyPlugin,
   ZeroDevSessionKeyPlugin__factory,
   FunctionSignaturePolicy,
-  FunctionSignaturePolicy__factory
+  FunctionSignaturePolicy__factory,
+  FunctionSignaturePolicyFactory,
+  FunctionSignaturePolicyFactory__factory
 } from '../typechain'
 import {
   AddressZero,
@@ -300,6 +302,31 @@ describe.only('ZeroDev Gnosis Proxy', function () {
       expect(nonce_after).to.be.eq(ethers.BigNumber.from(nonce_before).add(1))
     })
   })
+
+  describe('function signature factory', function() {
+    let factory : FunctionSignaturePolicyFactory;
+    beforeEach(async function(){
+      factory = await new FunctionSignaturePolicyFactory__factory(ethersSigner).deploy();
+    });
+
+    it('should match address', async function(){
+      const tx = await factory.deploy(
+        [{
+          to: counter.address,
+          sig: counter.interface.getSighash('count')
+        }]
+      ).then(async r => r.wait());
+
+      const policyAddress = tx.events[0].args[0]
+
+      expect(policyAddress).to.equal(await factory.getPolicy([
+        {
+          to: counter.address,
+          sig: counter.interface.getSighash('count')
+        }
+      ]));
+    });
+  });
 })
 
 async function getSessionNonce (

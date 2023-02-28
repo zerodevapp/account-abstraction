@@ -20,7 +20,7 @@ const MOCK_VALID_UNTIL = '0x00000000deadbeef'
 const MOCK_VALID_AFTER = '0x0000000000001234'
 const MOCK_SIG = '0x1234'
 
-describe.only('EntryPoint with VerifyingPaymaster', function () {
+describe('EntryPoint with VerifyingPaymaster', function () {
   let entryPoint: EntryPoint
   let accountOwner: Wallet
   const ethersSigner = ethers.provider.getSigner()
