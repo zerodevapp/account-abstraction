@@ -8,7 +8,6 @@ import "../../interfaces/IAccount.sol";
 import "../../interfaces/IEntryPoint.sol";
 import "./IPlugin.sol";
 import "../ZeroDevPluginSafe.sol";
-import "hardhat/console.sol";
 
 abstract contract ZeroDevBasePlugin is IPlugin, Executor, EIP712 {
     function validatePluginData(
@@ -36,7 +35,7 @@ abstract contract ZeroDevBasePlugin is IPlugin, Executor, EIP712 {
 
     function parseDataAndSignature(
         bytes calldata _packed
-    ) public view returns(bytes calldata data, bytes calldata signature) {
+    ) public pure returns(bytes calldata data, bytes calldata signature) {
         uint256 dataPosition = uint256(bytes32(_packed[0:32]));
         uint256 dataLength = uint256(bytes32(_packed[dataPosition:dataPosition+32]));
         uint256 signaturePosition = uint256(bytes32(_packed[32:64]));
