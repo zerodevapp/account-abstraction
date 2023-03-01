@@ -16,7 +16,7 @@ const deployMultisend: DeployFunction = async function (hre: HardhatRuntimeEnvir
 
   console.log('==multisend addr=', multisend.address)
 
-  if (multisend.address.toLowerCase() !== EXPECTED_MULTISEND_ADDRESS) {
+  if (multisend.address.toLowerCase() !== EXPECTED_MULTISEND_ADDRESS  && (await hre.ethers.provider.getNetwork()).chainId !== 31337) {
     throw new Error(`Expected multisend address ${EXPECTED_MULTISEND_ADDRESS} but got ${multisend.address}`)
   }
 }
