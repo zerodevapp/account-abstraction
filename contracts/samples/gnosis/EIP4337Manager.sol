@@ -10,8 +10,9 @@ import "@gnosis.pm/safe-contracts/contracts/GnosisSafe.sol";
 import "@gnosis.pm/safe-contracts/contracts/base/Executor.sol";
 import "@gnosis.pm/safe-contracts/contracts/examples/libraries/GnosisSafeStorage.sol";
 import "./EIP4337Fallback.sol";
-import "../interfaces/IAccount.sol";
-import "../interfaces/IEntryPoint.sol";
+import "../../interfaces/IAccount.sol";
+import "../../interfaces/IEntryPoint.sol";
+import "../../utils/Exec.sol";
 
     using ECDSA for bytes32;
 
@@ -20,7 +21,7 @@ import "../interfaces/IEntryPoint.sol";
  * Called (through the fallback module) using "delegate" from the GnosisSafe as an "IAccount",
  * so must implement validateUserOp
  * holds an immutable reference to the EntryPoint
- * Inherits GnosisSafeStorage so that it can reference the memory storage
+ * Inherits GnosisSafe so that it can reference the memory storage
  */
 contract EIP4337Manager is IAccount, GnosisSafeStorage, Executor {
 
@@ -28,7 +29,7 @@ contract EIP4337Manager is IAccount, GnosisSafeStorage, Executor {
     address public immutable entryPoint;
 
     // return value in case of signature failure, with no time-range.
-    // equivalent to packSigTimeRange(true,0,0);
+    // equivalent to _packValidationData(true,0,0);
     uint256 constant internal SIG_VALIDATION_FAILED = 1;
 
     address internal constant SENTINEL_MODULES = address(0x1);
@@ -41,18 +42,17 @@ contract EIP4337Manager is IAccount, GnosisSafeStorage, Executor {
     /**
      * delegate-called (using execFromModule) through the fallback, so "real" msg.sender is attached as last 20 bytes
      */
-    function validateUserOp(UserOperation calldata userOp, bytes32 userOpHash, address /*aggregator*/, uint256 missingAccountFunds)
-    external override returns (uint256 sigTimeRange) {
-        require(msg.sender == eip4337Fallback, "account: not from eip4337Fallback");
-        address _msgSender = address(bytes20(msg.data[msg.data.length - 20 :]));
-        require(_msgSender == entryPoint, "account: not from entrypoint");
+    function validateUserOp(UserOperation calldata userOp, bytes32 userOpHash, uint256 missingAccountFunds)
+    external override returns (uint256 validationData) {
+        address msgSender = address(bytes20(msg.data[msg.data.length - 20 :]));
+        require(msgSender == entryPoint, "account: not from entrypoint");
 
         GnosisSafe pThis = GnosisSafe(payable(address(this)));
         bytes32 hash = userOpHash.toEthSignedMessageHash();
         address recovered = hash.recover(userOp.signature);
         require(threshold == 1, "account: only threshold 1");
         if (!pThis.isOwner(recovered)) {
-            sigTimeRange = SIG_VALIDATION_FAILED;
+            validationData = SIG_VALIDATION_FAILED;
         }
 
         if (userOp.initCode.length == 0) {
@@ -61,8 +61,8 @@ contract EIP4337Manager is IAccount, GnosisSafeStorage, Executor {
         }
 
         if (missingAccountFunds > 0) {
-            //TODO: MAY pay more than the minimum, to deposit for future transactions
-            (bool success,) = payable(_msgSender).call{value : missingAccountFunds}("");
+            //Note: MAY pay more than the minimum, to deposit for future transactions
+            (bool success,) = payable(msgSender).call{value : missingAccountFunds}("");
             (success);
             //ignore failure (its EntryPoint's job to verify, not account.)
         }
@@ -81,8 +81,8 @@ contract EIP4337Manager is IAccount, GnosisSafeStorage, Executor {
         bytes memory data,
         Enum.Operation operation
     ) external {
-        address _msgSender = address(bytes20(msg.data[msg.data.length - 20 :]));
-        require(_msgSender == entryPoint, "account: not from entrypoint");
+        address msgSender = address(bytes20(msg.data[msg.data.length - 20 :]));
+        require(msgSender == entryPoint, "account: not from entrypoint");
         require(msg.sender == eip4337Fallback, "account: not from EIP4337Fallback");
 
         bool success = execute(
@@ -93,21 +93,7 @@ contract EIP4337Manager is IAccount, GnosisSafeStorage, Executor {
             type(uint256).max
         );
 
-        bytes memory returnData;
-        assembly {
-            // Load free memory location
-            let ptr := mload(0x40)
-            // We allocate memory for the return data by setting the free memory location to
-            // current free memory location + data size + 32 bytes for data size value
-            mstore(0x40, add(ptr, add(returndatasize(), 0x20)))
-            // Store the size
-            mstore(ptr, returndatasize())
-            // Store the data
-            returndatacopy(add(ptr, 0x20), 0, returndatasize())
-            // Point the return data to the correct memory location
-            returnData := ptr
-        }
-
+        bytes memory returnData = Exec.getReturnData(type(uint256).max);
         // Revert with the actual reason string
         // Adopted from: https://github.com/Uniswap/v3-periphery/blob/464a8a49611272f7349c970e0fadb7ec1d3c1086/contracts/base/Multicall.sol#L16-L23
         if (!success) {
@@ -155,8 +141,35 @@ contract EIP4337Manager is IAccount, GnosisSafeStorage, Executor {
         pThis.enableModule(newManager.entryPoint());
         pThis.enableModule(eip4337fallback);
         pThis.setFallbackHandler(eip4337fallback);
+
+        validateEip4337(pThis, newManager);
     }
 
+    /**
+     * Validate this gnosisSafe is callable through the EntryPoint.
+     * the test is might be incomplete: we check that we reach our validateUserOp and fail on signature.
+     *  we don't test full transaction
+     */
+    function validateEip4337(GnosisSafe safe, EIP4337Manager manager) public {
+
+        // this prevents mistaken replaceEIP4337Manager to disable the module completely.
+        // minimal signature that pass "recover"
+        bytes memory sig = new bytes(65);
+        sig[64] = bytes1(uint8(27));
+        sig[2] = bytes1(uint8(1));
+        sig[35] = bytes1(uint8(1));
+        UserOperation memory userOp = UserOperation(address(safe), uint256(nonce), "", "", 0, 1000000, 0, 0, 0, "", sig);
+        UserOperation[] memory userOps = new UserOperation[](1);
+        userOps[0] = userOp;
+        IEntryPoint _entryPoint = IEntryPoint(payable(manager.entryPoint()));
+        try _entryPoint.handleOps(userOps, payable(msg.sender)) {
+            revert("validateEip4337: handleOps must fail");
+        } catch (bytes memory error) {
+            if (keccak256(error) != keccak256(abi.encodeWithSignature("FailedOp(uint256,string)", 0, "AA24 signature error"))) {
+                revert(string(error));
+            }
+        }
+    }
     /**
      * enumerate modules, and find the currently active EIP4337 manager (and previous module)
      * @return prev prev module, needed by replaceEIP4337Manager
@@ -167,11 +180,11 @@ contract EIP4337Manager is IAccount, GnosisSafeStorage, Executor {
         (address[] memory modules,) = safe.getModulesPaginated(SENTINEL_MODULES, 100);
         for (uint i = 0; i < modules.length; i++) {
             address module = modules[i];
-            (bool success,bytes memory ret) = module.staticcall(abi.encodeWithSignature("eip4337manager()"));
-            if (success) {
-                manager = abi.decode(ret, (address));
-                return (prev, manager);
+            try EIP4337Fallback(module).eip4337manager() returns (address _manager) {
+                return (prev, _manager);
             }
+            // solhint-disable-next-line no-empty-blocks
+            catch {}
             prev = module;
         }
         return (address(0), address(0));

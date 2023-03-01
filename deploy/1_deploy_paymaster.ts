@@ -17,16 +17,16 @@ const deployPaymaster: DeployFunction = async function (hre: HardhatRuntimeEnvir
   // storage and therefore does not need to be staked.
   const paymaster = await hre.deployments.deploy(
     'VerifyingPaymaster', {
-    from,
-    args: [entryPoint.address, paymasterOwner],
-    deterministicDeployment: true
-  })
+      from,
+      args: [entryPoint.address, paymasterOwner],
+      deterministicDeployment: true
+    })
   console.log('==paymaster addr=', paymaster.address)
 
   const paymasterContract = (await hre.ethers.getContractAt('VerifyingPaymaster', paymaster.address)).connect(signer)
   const tx = await paymasterContract.deposit({ value: PAYMASTER_DEPOSIT })
   await tx.wait()
-  console.log("Paymaster deposited")
+  console.log('Paymaster deposited')
 }
 
 export default deployPaymaster

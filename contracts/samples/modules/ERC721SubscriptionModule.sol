@@ -78,4 +78,3 @@ contract ERC721SubscriptionModule {
     }
 
 }
- 

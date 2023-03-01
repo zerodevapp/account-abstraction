@@ -1,11 +1,10 @@
 import './aa.init'
 import { ethers } from 'hardhat'
 import { Signer } from 'ethers'
-// import ABIDecoder
 import {
+  EIP4337Fallback__factory,
   EIP4337Manager,
   EIP4337Manager__factory,
-  EIP4337Fallback__factory,
   EntryPoint,
   EntryPoint__factory,
   GnosisSafe,
@@ -43,7 +42,6 @@ describe('Gnosis Proxy', function () {
   let counter: TestCounter
   let proxySafe: GnosisSafe
   let safe_execTxCallData: string
-  let safe_execFailTxCallData: string
 
   let accountFactory: GnosisSafeAccountFactory
 
@@ -67,7 +65,7 @@ describe('Gnosis Proxy', function () {
     counter = await new TestCounter__factory(ethersSigner).deploy()
 
     accountFactory = await new GnosisSafeAccountFactory__factory(ethersSigner)
-      .deploy(ethers.utils.formatBytes32String("PREFIX"), proxyFactory.address, safeSingleton.address, manager.address)
+      .deploy(proxyFactory.address, safeSingleton.address, manager.address)
 
     await accountFactory.createAccount(ownerAddress, 0)
     // we use our accountFactory to create and configure the proxy.
@@ -85,18 +83,22 @@ describe('Gnosis Proxy', function () {
 
     const counter_countCallData = counter.interface.encodeFunctionData('count')
     safe_execTxCallData = manager.interface.encodeFunctionData('executeAndRevert', [counter.address, 0, counter_countCallData, 0])
-
-    const counter_countFailCallData = counter.interface.encodeFunctionData('countFail')
-    safe_execFailTxCallData = manager.interface.encodeFunctionData('executeAndRevert', [counter.address, 0, counter_countFailCallData, 0])
   })
   let beneficiary: string
   beforeEach(() => {
     beneficiary = createAddress()
   })
 
-//  it.skip('should validate', async function () {
-//    await manager.callStatic.validateEip4337(proxySafe.address, manager.address, { gasLimit: 10e6 })
-//  })
+  it('#getCurrentEIP4337Manager', async () => {
+    // need some manager to query the current manager of a safe
+    const tempManager = await new EIP4337Manager__factory(ethersSigner).deploy(AddressZero)
+    const { manager: curManager } = await tempManager.getCurrentEIP4337Manager(proxySafe.address)
+    expect(curManager).to.eq(manager.address)
+  })
+
+  it('should validate', async function () {
+    await manager.callStatic.validateEip4337(proxySafe.address, manager.address, { gasLimit: 10e6 })
+  })
 
   it('should fail from wrong entrypoint', async function () {
     const op = await fillAndSign({
@@ -124,7 +126,7 @@ describe('Gnosis Proxy', function () {
     }, owner, entryPoint)
     // invalidate the signature
     op.callGasLimit = 1
-    await expect(entryPoint.handleOps([op], beneficiary)).to.revertedWith('FailedOp(0, "0x0000000000000000000000000000000000000000", "AA24 signature error")')
+    await expect(entryPoint.handleOps([op], beneficiary)).to.revertedWith('FailedOp(0, "AA24 signature error")')
   })
 
   it('should exec', async function () {
@@ -142,6 +144,9 @@ describe('Gnosis Proxy', function () {
   })
 
   it('should revert with reason', async function () {
+    const counter_countFailCallData = counter.interface.encodeFunctionData('countFail')
+    const safe_execFailTxCallData = manager.interface.encodeFunctionData('executeAndRevert', [counter.address, 0, counter_countFailCallData, 0])
+
     const op = await fillAndSign({
       sender: proxy.address,
       callGasLimit: 1e6,
@@ -151,13 +156,13 @@ describe('Gnosis Proxy', function () {
     console.log('gasUsed=', rcpt.gasUsed, rcpt.transactionHash)
 
     // decode the revertReason
-    const ev = rcpt.events!.find(ev => ev.event === 'UserOperationRevertReason')!;
-    let message = ev.args!.revertReason
+    const ev = rcpt.events!.find(ev => ev.event === 'UserOperationRevertReason')!
+    let message: string = ev.args!.revertReason
     if (message.startsWith('0x08c379a0')) {
       // Error(string)
       message = defaultAbiCoder.decode(['string'], '0x' + message.substring(10)).toString()
     }
-    expect(message).to.eq("count failed")
+    expect(message).to.eq('count failed')
   })
 
   let counterfactualAddress: string
@@ -186,10 +191,6 @@ describe('Gnosis Proxy', function () {
 
     const newCode = await ethers.provider.getCode(counterfactualAddress)
     expect(newCode.length).eq(324)
-
-    // createAccount should return the address even when the account has been deployed
-    const accountAddress = await accountFactory.callStatic.createAccount(ownerAddress, 123)
-    expect(accountAddress).eq(counterfactualAddress)
   })
 
   it('another op after creation', async function () {
@@ -208,16 +209,16 @@ describe('Gnosis Proxy', function () {
   it('should validate ERC1271 signatures', async function () {
     const safe = EIP4337Fallback__factory.connect(proxySafe.address, ethersSigner)
 
-    const message = ethers.utils.hexlify(ethers.utils.toUtf8Bytes("hello erc1271"))
+    const message = ethers.utils.hexlify(ethers.utils.toUtf8Bytes('hello erc1271'))
     const dataHash = ethers.utils.arrayify(ethers.utils.keccak256(message))
 
     const sig = await owner.signMessage(dataHash)
-    expect(await safe.isValidSignature(dataHash, sig)).to.be.eq("0x1626ba7e")
+    expect(await safe.isValidSignature(dataHash, sig)).to.be.eq('0x1626ba7e')
 
     // make an sig invalid
     const badWallet = ethers.Wallet.createRandom()
     const badSig = await badWallet.signMessage(dataHash)
-    expect(await safe.isValidSignature(dataHash, badSig)).to.be.not.eq("0x1626ba7e")
+    expect(await safe.isValidSignature(dataHash, badSig)).to.be.not.eq('0x1626ba7e')
   })
 
   context('#replaceEIP4337', () => {
@@ -259,17 +260,22 @@ describe('Gnosis Proxy', function () {
       expect(oldManager.toLowerCase()).to.eq(manager.address.toLowerCase())
       await ethersSigner.sendTransaction({
         to: ownerAddress,
-        value: parseEther('0.1')
+        value: parseEther('33')
       })
 
       const replaceManagerCallData = manager.interface.encodeFunctionData('replaceEIP4337Manager',
         [prev, oldManager, newManager.address])
       await proxySafe.execTransaction(manager.address, 0, replaceManagerCallData, 1, 1e6, 0, 0, AddressZero, AddressZero, signature).then(async r => r.wait())
 
+      // console.log(rcpt.events?.slice(-1)[0].event)
+
       expect(await proxySafe.isModuleEnabled(newEntryPoint.address)).to.equal(true)
       expect(await proxySafe.isModuleEnabled(newFallback)).to.equal(true)
       expect(await proxySafe.isModuleEnabled(entryPoint.address)).to.equal(false)
       expect(await proxySafe.isModuleEnabled(oldFallback)).to.equal(false)
+
+      const { manager: curManager } = await manager.getCurrentEIP4337Manager(proxySafe.address)
+      expect(curManager).to.eq(newManager.address)
     })
   })
 })
