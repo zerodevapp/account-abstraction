@@ -27,7 +27,7 @@ function getNetwork (name: string): { url: string, accounts: { mnemonic: string 
   // return getNetwork1(`wss://${name}.infura.io/ws/v3/${process.env.INFURA_ID}`)
 }
 
-function getAccounts (): string[] | string {
+function getAccounts (): string[] | { mnemonic : string} {
   const accs = []
   if (process.env.DEPLOYER_PRIVATE_KEY!) {
     accs.push(process.env.DEPLOYER_PRIVATE_KEY)
@@ -36,7 +36,7 @@ function getAccounts (): string[] | string {
     accs.push(process.env.PAYMASTER_OWNER_PRIVATE_KEY)
   }
   if (accs.length === 0) {
-    return mnemonic
+    return { mnemonic }
   } else {
     return accs
   }
