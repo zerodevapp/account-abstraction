@@ -67,9 +67,6 @@ contract ZeroDevPluginSafe is GnosisSafe, IAccount, EIP712 {
             return _validateUserOp(userOp, userOpHash, missingAccountFunds);
         } else if(userOp.signature.length > 97) {
             // userOp.signature = address(plugin) + validUntil + validAfter + pluginData + pluginSignature
-            if(userOp.initCode.length > 0) {
-                return SIG_VALIDATION_FAILED;
-            }
             address plugin = address(bytes20(userOp.signature[0:20]));
             uint48 validUntil = uint48(bytes6(userOp.signature[20:26]));
             uint48 validAfter = uint48(bytes6(userOp.signature[26:32]));

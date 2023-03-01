@@ -28,8 +28,7 @@ contract FunctionSignaturePolicy is IPolicy {
     ) external view override returns (bool)
     {
         if(
-         value > 0 ||
-            operation != Enum.Operation.Call
+         value > 0
         ) {
             return false;
         }
