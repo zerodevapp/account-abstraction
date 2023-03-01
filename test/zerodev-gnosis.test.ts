@@ -1,6 +1,6 @@
 import './aa.init'
 import { ethers } from 'hardhat'
-import { Contract, Signer } from 'ethers'
+import { Signer } from 'ethers'
 import {
   EntryPoint,
   EntryPoint__factory,
@@ -12,20 +12,18 @@ import {
   GnosisSafeProxyFactory__factory,
   TestCounter,
   TestCounter__factory,
-  ZeroDevSessionKeyPlugin,
-  ZeroDevSessionKeyPlugin__factory,
   FunctionSignaturePolicy,
   FunctionSignaturePolicy__factory,
   FunctionSignaturePolicyFactory,
-  FunctionSignaturePolicyFactory__factory
+  FunctionSignaturePolicyFactory__factory,
+  ZeroDevSessionKeyPlugin__factory,
+  ZeroDevSessionKeyPlugin
 } from '../typechain'
 import {
-  AddressZero,
   createAddress,
   createAccountOwner,
   deployEntryPoint,
   getBalance,
-  HashZero,
   isDeployed
 } from './testutils'
 import { fillAndSign, fillUserOp, getUserOpHash } from './UserOp'
@@ -33,18 +31,16 @@ import { defaultAbiCoder, hexConcat, hexZeroPad, parseEther } from 'ethers/lib/u
 import { expect } from 'chai'
 import { UserOperation } from './UserOperation'
 
-describe.only('ZeroDev Gnosis Proxy', function () {
+describe('ZeroDev Gnosis Proxy', function () {
   this.timeout(30000)
 
   let ethersSigner: Signer
   let safeSingleton: ZeroDevPluginSafe
-  let sessionKeyPlugin: ZeroDevSessionKeyPlugin
   let owner: Signer
   let ownerAddress: string
   let proxy: GnosisSafeProxy
   let entryPoint: EntryPoint
   let counter: TestCounter
-  let proxySafe: ZeroDevPluginSafe
   let safe_execTxCallData: string
 
   let accountFactory: ZeroDevGnosisSafeAccountFactory
@@ -68,8 +64,6 @@ describe.only('ZeroDev Gnosis Proxy', function () {
     ownerAddress = await owner.getAddress()
     counter = await new TestCounter__factory(ethersSigner).deploy()
 
-    sessionKeyPlugin = await new ZeroDevSessionKeyPlugin__factory(ethersSigner).deploy()
-
     accountFactory = await new ZeroDevGnosisSafeAccountFactory__factory(ethersSigner)
       .deploy(proxyFactory.address, safeSingleton.address)
 
@@ -79,8 +73,7 @@ describe.only('ZeroDev Gnosis Proxy', function () {
     const ev = await proxyFactory.queryFilter(proxyFactory.filters.ProxyCreation())
     const addr = ev[0].args.proxy
 
-    proxy =
-      proxySafe = ZeroDevPluginSafe__factory.connect(addr, owner)
+    proxy = ZeroDevPluginSafe__factory.connect(addr, owner)
 
     await ethersSigner.sendTransaction({
       to: proxy.address,
@@ -95,19 +88,18 @@ describe.only('ZeroDev Gnosis Proxy', function () {
     beneficiary = createAddress()
   })
 
-  it.skip('should fail from wrong entrypoint', async function () { // i don't know how to handle this properly i'll leave it a TODO
+  it('should fail from wrong entrypoint', async function () { // i don't know how to handle this properly i'll leave it a TODO
     const op = await fillAndSign({
       sender: proxy.address
     }, owner, entryPoint)
 
     const anotherEntryPoint = await new EntryPoint__factory(ethersSigner).deploy()
 
-    await expect(anotherEntryPoint.handleOps([op], beneficiary)).to.revertedWith('account: not from entrypoint')
+    await expect(anotherEntryPoint.handleOps([op], beneficiary)).to.revertedWith('FailedOp(0, "AA23 reverted: account: not from entryPoint")')
   })
 
   it('should fail on invalid userop', async function () {
-
-    await entryPoint.depositTo(proxy.address, {value: parseEther("1")});
+    await entryPoint.depositTo(proxy.address, { value: parseEther('1') })
     let op = await fillAndSign({
       sender: proxy.address,
       nonce: 1234,
@@ -115,9 +107,9 @@ describe.only('ZeroDev Gnosis Proxy', function () {
       callData: safe_execTxCallData
     }, owner, entryPoint)
     try {
-      const tx = await entryPoint.handleOps([op], beneficiary);
-      await tx.wait();
-    } catch (e : any) {
+      const tx = await entryPoint.handleOps([op], beneficiary)
+      await tx.wait()
+    } catch (e: any) {
       expect(e.message).to.include('FailedOp(0, \\"AA24 signature error\\")')
     }
 
@@ -303,19 +295,19 @@ describe.only('ZeroDev Gnosis Proxy', function () {
     })
   })
 
-  describe('function signature factory', function() {
-    let factory : FunctionSignaturePolicyFactory;
-    beforeEach(async function(){
-      factory = await new FunctionSignaturePolicyFactory__factory(ethersSigner).deploy();
-    });
+  describe('function signature factory', function () {
+    let factory: FunctionSignaturePolicyFactory
+    beforeEach(async function () {
+      factory = await new FunctionSignaturePolicyFactory__factory(ethersSigner).deploy()
+    })
 
-    it('should match address', async function(){
+    it('should match address', async function () {
       const tx = await factory.deploy(
         [{
           to: counter.address,
           sig: counter.interface.getSighash('count')
         }]
-      ).then(async r => r.wait());
+      ).then(async r => r.wait())
 
       const policyAddress = tx.events[0].args[0]
 
@@ -324,9 +316,9 @@ describe.only('ZeroDev Gnosis Proxy', function () {
           to: counter.address,
           sig: counter.interface.getSighash('count')
         }
-      ]));
-    });
-  });
+      ]))
+    })
+  })
 })
 
 async function getSessionNonce (

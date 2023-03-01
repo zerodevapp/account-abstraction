@@ -13,8 +13,7 @@ dotenv.config()
 
 const mnemonicFileName = process.env.MNEMONIC_FILE ?? `${process.env.HOME}/.secret/testnet-mnemonic.txt`
 let mnemonic = 'test '.repeat(11) + 'junk'
-if (fs.existsSync(mnemonicFileName)) { mnemonic = fs.readFileSync(mnemonicFileName, 'ascii') }
-else { mnemonic = "test test test test test test test test test test test junk"}
+if (fs.existsSync(mnemonicFileName)) { mnemonic = fs.readFileSync(mnemonicFileName, 'ascii') } else { mnemonic = 'test test test test test test test test test test test junk' }
 
 function getNetwork1 (url: string): { url: string, accounts: { mnemonic: string } } {
   return {
@@ -28,18 +27,18 @@ function getNetwork (name: string): { url: string, accounts: { mnemonic: string 
   // return getNetwork1(`wss://${name}.infura.io/ws/v3/${process.env.INFURA_ID}`)
 }
 
-function getAccounts() {
-  if (process.env.DEPLOYER_PRIVATE_KEY || process.env.PAYMASTER_OWNER_PRIVATE_KEY) {
-    let accs = [];
-    if (process.env.DEPLOYER_PRIVATE_KEY) {
-      accs.push(process.env.DEPLOYER_PRIVATE_KEY);
-    }
-    if (process.env.PAYMASTER_OWNER_PRIVATE_KEY) {
-      accs.push(process.env.PAYMASTER_OWNER_PRIVATE_KEY);
-    }
-    return accs;
-  } else {
+function getAccounts (): string[] | string {
+  const accs = []
+  if (process.env.DEPLOYER_PRIVATE_KEY!) {
+    accs.push(process.env.DEPLOYER_PRIVATE_KEY)
+  }
+  if (process.env.PAYMASTER_OWNER_PRIVATE_KEY!) {
+    accs.push(process.env.PAYMASTER_OWNER_PRIVATE_KEY)
+  }
+  if (accs.length === 0) {
     return mnemonic
+  } else {
+    return accs
   }
 }
 

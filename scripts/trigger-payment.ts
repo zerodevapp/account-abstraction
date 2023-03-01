@@ -4,7 +4,7 @@ import hre from 'hardhat'
 // 30gwei
 const gasPrice = ethers.utils.parseUnits('30', 'gwei')
 
-async function main () {
+async function main (): Promise<void> {
   const receiver = process.env.RECEIVER
   if (!receiver) {
     throw new Error('RECEIVER env var not set')
