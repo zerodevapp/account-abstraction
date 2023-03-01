@@ -200,7 +200,7 @@ describe('ZeroDev Gnosis Proxy', function () {
     console.log('gasUsed=', rcpt.gasUsed, rcpt.transactionHash)
   })
 
-  describe('policy session key', async function () {
+  describe('policy session key', function () {
     let sessionKey: Signer
     let userSignedUserOp: UserOperation
     let policy: FunctionSignaturePolicy
