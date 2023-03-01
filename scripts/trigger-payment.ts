@@ -6,7 +6,7 @@ const gasPrice = ethers.utils.parseUnits('30', 'gwei')
 
 async function main (): Promise<void> {
   const receiver = process.env.RECEIVER
-  if (!receiver) {
+  if (receiver === undefined) {
     throw new Error('RECEIVER env var not set')
   }
 
