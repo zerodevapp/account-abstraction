@@ -24,12 +24,11 @@ contract FunctionSignaturePolicy is IPolicy {
         address to,
         uint256 value,
         bytes calldata data,
-        Enum.Operation operation
+        Enum.Operation
     ) external view override returns (bool)
     {
         if(
-         value > 0 ||
-            operation != Enum.Operation.Call
+         value > 0
         ) {
             return false;
         }
