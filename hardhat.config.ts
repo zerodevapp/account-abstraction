@@ -39,7 +39,7 @@ function getAccounts() {
     }
     return accs;
   } else {
-    return { mnemonic }
+    return mnemonic
   }
 }
 
