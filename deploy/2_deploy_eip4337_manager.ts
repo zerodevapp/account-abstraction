@@ -8,10 +8,10 @@ const deployEIP4337Manager: DeployFunction = async function (hre: HardhatRuntime
 
   const manager = await hre.deployments.deploy(
     'EIP4337Manager', {
-    from,
-    args: [entryPoint.address],
-    deterministicDeployment: true
-  })
+      from,
+      args: [entryPoint.address],
+      deterministicDeployment: true
+    })
   console.log('==EIP4337Manager addr=', manager.address)
 }
 

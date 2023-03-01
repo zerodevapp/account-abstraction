@@ -9,14 +9,14 @@ const deployUpdateSingleton: DeployFunction = async function (hre: HardhatRuntim
 
   const updateSingleton = await hre.deployments.deploy(
     'UpdateSingleton', {
-    from,
-    args: [],
-    deterministicDeployment: true,
-  })
+      from,
+      args: [],
+      deterministicDeployment: true
+    })
 
   console.log('==update singleton addr=', updateSingleton.address)
 
-  if (updateSingleton.address.toLowerCase() !== EXPECTED_UPDATE_SINGLETON_ADDRESS) {
+  if (updateSingleton.address.toLowerCase() !== EXPECTED_UPDATE_SINGLETON_ADDRESS && (await hre.ethers.provider.getNetwork()).chainId !== 31337) {
     throw new Error(`Expected updateSingleton address ${EXPECTED_UPDATE_SINGLETON_ADDRESS} but got ${updateSingleton.address}`)
   }
 }

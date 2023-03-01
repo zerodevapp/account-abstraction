@@ -4,7 +4,7 @@ import hre from 'hardhat'
 // 30gwei
 const gasPrice = ethers.utils.parseUnits('30', 'gwei')
 
-async function main() {
+async function main (): Promise<void> {
   const receiver = process.env.RECEIVER
   if (!receiver) {
     throw new Error('RECEIVER env var not set')
@@ -26,25 +26,25 @@ async function main() {
   // mint an NFT to sender
   console.log('minting NFT')
   let tx = await nftContract.mint(senderSigner.getAddress(), {
-    gasPrice,
+    gasPrice
   })
   await tx.wait()
 
   // approve the NFT for transfer
   console.log('approving NFT')
   tx = await nftContract.connect(senderSigner).approve(module.address, tokenId, {
-    gasPrice,
+    gasPrice
   })
   await tx.wait()
 
   console.log('triggering payment')
   tx = await moduleContract.triggerPayment(receiver, tokenId, {
     gasPrice,
-    gasLimit: 1000000,
+    gasLimit: 1000000
   })
   await tx.wait()
 
-  console.log("Payment triggered")
+  console.log('Payment triggered')
 }
 
 main()
