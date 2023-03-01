@@ -37,6 +37,7 @@ function getAccounts() {
     if (process.env.PAYMASTER_OWNER_PRIVATE_KEY) {
       accs.push(process.env.PAYMASTER_OWNER_PRIVATE_KEY);
     }
+    return accs;
   } else {
     return { mnemonic }
   }
