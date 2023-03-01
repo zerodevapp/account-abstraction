@@ -15,20 +15,23 @@ contract ZeroDevGnosisSafeAccountFactory {
     address public immutable safeSingleton;
     DefaultCallbackHandler public immutable defaultCallback;
 
+    event AccountCreated(address indexed account, address indexed owner, uint salt); 
+
     constructor(GnosisSafeProxyFactory _proxyFactory, address _safeSingleton) {
         proxyFactory = _proxyFactory;
         safeSingleton = _safeSingleton;
         defaultCallback = new DefaultCallbackHandler();
     }
 
-    function createAccount(address owner,uint256 salt) public returns (address) {
+    function createAccount(address owner,uint256 salt) public returns (address account) {
         address addr = getAddress(owner, salt);
         uint codeSize = addr.code.length;
         if (codeSize > 0) {
             return addr;
         }
-        return address(proxyFactory.createProxyWithNonce(
-                safeSingleton, getInitializer(owner), salt));
+        account = address(proxyFactory.createProxyWithNonce(safeSingleton, getInitializer(owner), salt));
+
+        emit AccountCreated(account, owner, salt); 
     }
 
     function getInitializer(address owner) internal view returns (bytes memory) {
