@@ -16,10 +16,12 @@ const deployZeroDev: DeployFunction = async function (hre: HardhatRuntimeEnviron
         log: true,
         deterministicDeployment: true
     });
+    
+    const singletone = await ethers.getContract('ZeroDevPluginSafe');
 
     await deploy('ZeroDevGnosisSafeAccountFactory', {
         from: deployerAddress,
-        args: [proxyFactory, entrypoint],
+        args: [proxyFactory, singletone.address],
         log: true,
         deterministicDeployment: true
     });
