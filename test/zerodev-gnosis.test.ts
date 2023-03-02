@@ -31,7 +31,7 @@ import { defaultAbiCoder, hexConcat, hexZeroPad, parseEther } from 'ethers/lib/u
 import { expect } from 'chai'
 import { UserOperation } from './UserOperation'
 
-describe('ZeroDev Gnosis Proxy', function () {
+describe.only('ZeroDev Gnosis Proxy', function () {
   this.timeout(30000)
 
   let ethersSigner: Signer
@@ -66,6 +66,14 @@ describe('ZeroDev Gnosis Proxy', function () {
 
     accountFactory = await new ZeroDevGnosisSafeAccountFactory__factory(ethersSigner)
       .deploy(proxyFactory.address, safeSingleton.address)
+
+    const initCode = hexConcat([hexZeroPad(accountFactory.address, 20), accountFactory.interface.encodeFunctionData("createAccount", [ownerAddress, 0])]);
+
+    const expectedAddr = await entryPoint.callStatic.getSenderAddress(initCode).catch( e => {
+      return e.errorArgs.sender
+    });;
+
+    console.log("EXPECTED :" + expectedAddr);
 
     await accountFactory.createAccount(ownerAddress, 0)
     // we use our accountFactory to create and configure the proxy.

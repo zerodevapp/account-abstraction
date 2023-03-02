@@ -5,6 +5,7 @@ import '@typechain/hardhat'
 import { HardhatUserConfig } from 'hardhat/config'
 import 'hardhat-deploy'
 import '@nomiclabs/hardhat-etherscan'
+import "hardhat-deploy-ethers";
 
 import 'solidity-coverage'
 
