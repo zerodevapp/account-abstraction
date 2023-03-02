@@ -24,6 +24,12 @@ const deployZeroDev: DeployFunction = async function (hre: HardhatRuntimeEnviron
         deterministicDeployment: true
     });
 
+    await deploy('ZeroDevSessionKeyPlugin', {
+        from: deployerAddress,
+        log: true,
+        deterministicDeployment: true
+    })
+
     await deploy('FunctionSignaturePolicyFactory',{
         from: deployerAddress,
         log: true,
