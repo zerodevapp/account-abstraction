@@ -60,23 +60,10 @@ contract ZeroDevPluginSafe is GnosisSafe, IAccount, EIP712 {
         }
     }
 
-    // small fix to handle userOp hash can be used for attack when offset location is not checked
-    // info : https://github.com/eth-infinitism/account-abstraction/issues/237
-    function checkUserOpOffset(UserOperation calldata userOp) public pure returns(bool result) {
-        bytes calldata sig = userOp.signature;
-        bytes calldata cd = userOp.callData;
-        bytes calldata initCode = userOp.initCode;
-        bytes calldata paymasterAndData = userOp.paymasterAndData;
-        assembly {
-            if and(and(gt(sig.offset, cd.offset), gt(sig.offset, initCode.offset)), gt(sig.offset, paymasterAndData.offset)) {
-                result := 1
-            } 
-        }
-    }
 
     function validateUserOp(UserOperation calldata userOp, bytes32 userOpHash, uint256 missingAccountFunds)
     external returns (uint256 validationData) {
-        require(checkUserOpOffset(userOp), "userOp: invalid offset");
+        require(UserOperationLib.checkUserOpOffset(userOp), "userOp: invalid offset");
         require(msg.sender == entryPoint, "account: not from entryPoint");
         if(userOp.signature.length == 65){
             return _validateUserOp(userOp, userOpHash, missingAccountFunds);
