@@ -3,10 +3,10 @@ pragma solidity ^0.8.0;
 
 import "@gnosis.pm/safe-contracts/contracts/GnosisSafe.sol";
 import "@openzeppelin/contracts/utils/cryptography/draft-EIP712.sol";
-import "./plugin/IPlugin.sol";
-import "../core/Helpers.sol";
-import "../interfaces/IAccount.sol";
-import "../utils/Exec.sol";
+import "../../plugin/IPlugin.sol";
+import "../../../core/Helpers.sol";
+import "../../../interfaces/IAccount.sol";
+import "../../../utils/Exec.sol";
 
 contract ZeroDevPluginSafe is GnosisSafe, IAccount, EIP712 {
 

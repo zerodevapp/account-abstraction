@@ -2,7 +2,6 @@
 pragma solidity ^0.8.0;
 
 import "./IPolicy.sol";
-import "../../ZeroDevPluginSafe.sol";
 import "@openzeppelin/contracts/utils/Create2.sol";
 
 struct Policy {

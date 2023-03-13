@@ -7,7 +7,6 @@ import "@openzeppelin/contracts/utils/cryptography/draft-EIP712.sol";
 import "../../interfaces/IAccount.sol";
 import "../../interfaces/IEntryPoint.sol";
 import "./IPlugin.sol";
-import "../ZeroDevPluginSafe.sol";
 
 abstract contract ZeroDevBasePlugin is IPlugin, Executor, EIP712 {
     function validatePluginData(
