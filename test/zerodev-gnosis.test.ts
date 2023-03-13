@@ -31,7 +31,7 @@ import { defaultAbiCoder, hexConcat, hexZeroPad, parseEther } from 'ethers/lib/u
 import { expect } from 'chai'
 import { UserOperation } from './UserOperation'
 
-describe.only('ZeroDev Gnosis Proxy', function () {
+describe('ZeroDev Gnosis Proxy', function () {
   this.timeout(30000)
 
   let ethersSigner: Signer
