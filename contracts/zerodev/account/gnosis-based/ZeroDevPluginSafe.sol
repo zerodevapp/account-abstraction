@@ -95,6 +95,11 @@ contract ZeroDevPluginSafe is GnosisSafe, IAccount, EIP712 {
                 missingAccountFunds
             );
             bool res = abi.decode(ret, (bool));
+            if(res && missingAccountFunds > 0) {
+                //TODO: MAY pay more than the minimum, to deposit for future transactions
+                (bool success,) = payable(msg.sender).call{value : missingAccountFunds}("");
+                (success);
+            }
             return _packValidationData(!res, validUntil, validAfter);
         } else {
             return SIG_VALIDATION_FAILED;
@@ -110,17 +115,14 @@ contract ZeroDevPluginSafe is GnosisSafe, IAccount, EIP712 {
         }
 
         if (userOp.initCode.length == 0) {
-            if(nonce != userOp.nonce) {
+            if(nonce++ != userOp.nonce) {
                 return SIG_VALIDATION_FAILED;
             }
-            nonce = uint256(nonce) + 1;
         }
 
         if (missingAccountFunds > 0) {
-            //TODO: MAY pay more than the minimum, to deposit for future transactions
-            (bool success,) = payable(msg.sender).call{value : missingAccountFunds}("");
+            (bool success, ) = msg.sender.call{value : missingAccountFunds}("");
             (success);
-            //ignore failure (its EntryPoint's job to verify, not account.)
         }
     }
 

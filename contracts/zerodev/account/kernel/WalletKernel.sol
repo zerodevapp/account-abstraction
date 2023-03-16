@@ -7,13 +7,19 @@ import "../../plugin/IPlugin.sol";
 import "../../../core/Helpers.sol";
 import "../../../interfaces/IAccount.sol";
 import "../../utils/OpinionatedExec.sol";
+import "./Compatibility.sol";
 
 struct WalletKernelStorage {
     address owner;
     uint256 nonce;
 }
 
-contract WalletKernel is IAccount, EIP712 {
+
+/// @title Wallet Kernel
+/// @author taek<leekt216@gmail.com>
+/// @notice wallet kernel for minimal wallet functionality
+/// @dev supports only 1 owner and 1 threshold, multiple plugins
+contract WalletKernel is IAccount, EIP712, Compatibility {
 
     function getWalletKernelStorage() internal pure returns (WalletKernelStorage storage ws) {
         bytes32 storagePosition = bytes32(uint256(keccak256("zero-dev.account.walletkernel")) - 1);
@@ -28,7 +34,7 @@ contract WalletKernel is IAccount, EIP712 {
 
     error QueryResult(bytes result);
 
-    constructor(address _entryPoint) EIP712("WalletKernel", "1.0.0") {
+    constructor(address _entryPoint) EIP712("WalletKernel", "0.0.1") {
         entryPoint = _entryPoint;
     }
 
@@ -82,7 +88,7 @@ contract WalletKernel is IAccount, EIP712 {
         require(UserOperationLib.checkUserOpOffset(userOp), "userOp: invalid offset");
         require(msg.sender == entryPoint, "account: not from entryPoint");
         if(userOp.signature.length == 65){
-            return _validateUserOp(userOp, userOpHash, missingAccountFunds);
+            validationData = _validateUserOp(userOp, userOpHash);
         } else if(userOp.signature.length > 97) {
             // userOp.signature = address(plugin) + validUntil + validAfter + pluginData + pluginSignature
             address plugin = address(bytes20(userOp.signature[0:20]));
@@ -111,13 +117,21 @@ contract WalletKernel is IAccount, EIP712 {
                 missingAccountFunds
             );
             bool res = abi.decode(ret, (bool));
-            return _packValidationData(!res, validUntil, validAfter);
+            if(res) {
+                return SIG_VALIDATION_FAILED;
+            }
+            validationData = _packValidationData(!res, validUntil, validAfter);
         } else {
             return SIG_VALIDATION_FAILED;
         }
+        if(missingAccountFunds > 0) { // we are going to assume signature is valid at this point
+            (bool success, ) = msg.sender.call{value: missingAccountFunds}("");
+            (success);
+            return validationData;
+        }
     }
 
-    function _validateUserOp(UserOperation calldata userOp, bytes32 userOpHash, uint256 missingAccountFunds)
+    function _validateUserOp(UserOperation calldata userOp, bytes32 userOpHash)
     internal returns (uint256 validationData) {
         bytes32 hash = ECDSA.toEthSignedMessageHash(userOpHash);
         address recovered = ECDSA.recover(hash,userOp.signature);
@@ -130,13 +144,6 @@ contract WalletKernel is IAccount, EIP712 {
             if(ws.nonce++ != userOp.nonce) {
                 return SIG_VALIDATION_FAILED;
             }
-        }
-
-        if (missingAccountFunds > 0) {
-            //TODO: MAY pay more than the minimum, to deposit for future transactions
-            (bool success,) = payable(msg.sender).call{value : missingAccountFunds}("");
-            (success);
-            //ignore failure (its EntryPoint's job to verify, not account.)
         }
     }
 
@@ -168,7 +175,7 @@ contract WalletKernel is IAccount, EIP712 {
     function isValidSignature(
         bytes32 _hash,
         bytes memory _signature
-    ) external view returns (bytes4) {
+    ) public override view returns (bytes4) {
         bytes32 hash = ECDSA.toEthSignedMessageHash(_hash);
         address recovered = ECDSA.recover(hash, _signature);
         WalletKernelStorage storage ws = getWalletKernelStorage();
