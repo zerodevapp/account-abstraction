@@ -14,6 +14,7 @@ import "./SimpleAccount.sol";
  */
 contract SimpleAccountFactory {
     SimpleAccount public immutable accountImplementation;
+    event AccountCreated(address indexed account, address indexed owner, uint salt); 
 
     constructor(IEntryPoint _entryPoint) {
         accountImplementation = new SimpleAccount(_entryPoint);
@@ -35,6 +36,7 @@ contract SimpleAccountFactory {
                 address(accountImplementation),
                 abi.encodeCall(SimpleAccount.initialize, (owner))
             )));
+        emit AccountCreated(address(ret), owner, salt);
     }
 
     /**

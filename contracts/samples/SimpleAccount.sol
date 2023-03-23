@@ -150,5 +150,28 @@ contract SimpleAccount is BaseAccount, TokenCallbackHandler, UUPSUpgradeable, In
         (newImplementation);
         _onlyOwner();
     }
+
+
+    /**
+     * check ERC-1271 signature.  We support both eth_sign and raw signatures
+     * @param _hash hash to be signed
+     * @param _signature signature
+     */
+    function isValidSignature(
+        bytes32 _hash,
+        bytes memory _signature
+    ) public view returns (bytes4) {
+        if(owner == ECDSA.recover(_hash, _signature)) {
+            return 0x1626ba7e;
+        }
+        bytes32 hash = ECDSA.toEthSignedMessageHash(_hash);
+        address recovered = ECDSA.recover(hash, _signature);
+        // Validate signatures
+        if (owner == recovered) {
+            return 0x1626ba7e;
+        } else {
+            return 0xffffffff;
+        }
+    }
 }
 
